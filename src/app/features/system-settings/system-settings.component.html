@@ -1,0 +1,71 @@
+<div class="settings-form-container">
+    <div class="settings-form-header">
+        <h1 class="mat-headline-4">System Settings</h1>
+
+    </div>
+
+    <div *ngIf="isLoading" class="loading-spinner">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <form *ngIf="!isLoading" [formGroup]="settingsForm" (ngSubmit)="onSubmit()">
+        <mat-card>
+            <mat-card-content>
+
+                <div class="form-row-mode">
+                    <!-- settings Name -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Clinic Name</mat-label>
+                        <input matInput formControlName="clinicName" required />
+                        <mat-error *ngIf="settingsForm.get('clinicName')?.hasError('required')">
+                            Clinic name is required
+                        </mat-error>
+                    </mat-form-field>
+
+                    <!-- Fee Priority-->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Fee Priority</mat-label>
+                        <mat-select formControlName="feePriority" required>
+                            <mat-option value="">Select Fee Priority</mat-option>
+                            <mat-option value="Default">Default</mat-option>
+                            <mat-option value="Doctor">Doctor</mat-option>
+                            <mat-option value="Department">Department</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="settingsForm.get('feePriority')?.hasError('required')">
+                            Fee Priority is required
+                        </mat-error>
+                    </mat-form-field>
+
+                     <!-- Default Revisit Days -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Default Revisit Days</mat-label>
+                        <input matInput type="number" formControlName="defaultRevisitDays" placeholder="e.g., 15" />
+                        <mat-error *ngIf="settingsForm.get('defaultRevisitDays')?.hasError('min')">
+                            Must be at least 1 day
+                        </mat-error>
+                    </mat-form-field>
+
+                    <!-- Default Consultation Fee -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Default Consultation Fee</mat-label>
+                        <input matInput type="number" placeholder="e.g., 500"
+                            formControlName="defaultFee" />
+                    </mat-form-field>
+
+
+                </div>
+
+              
+
+
+            </mat-card-content>
+
+            <mat-card-actions align="end">
+                <button mat-raised-button color="primary" type="submit" [disabled]="settingsForm.invalid">
+                    Save Settings
+                </button>
+            </mat-card-actions>
+        </mat-card>
+    </form>
+
+</div>

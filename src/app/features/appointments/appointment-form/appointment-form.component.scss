@@ -1,0 +1,116 @@
+
+.appointment-form-container {
+  padding: 20px;
+}
+
+.appointment-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  h1 {
+    margin: 0;
+  }
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  mat-form-field {
+    flex: 1;
+    min-width: 200px;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .appointment-form-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+.form-row-mode {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  mat-form-field {
+    flex: 1; /* Default width for all fields */
+    min-width: 150px;
+  }
+
+  /* Make specific ones wider or smaller */
+  mat-form-field:first-child, /* First Name */
+  mat-form-field:nth-child(2) { /* Last Name */
+    flex: 2; /* Twice the width of Gender */
+  }
+
+  mat-form-field:nth-child(3) { /* Gender */
+    flex: 1; /* Smaller width */
+    min-width: 150px;
+  }
+}
+
+
+@keyframes fadeInChip {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-1px);
+  }
+}
+
+.dept-chip {
+  display: inline-flex;
+  align-items: center;
+  background-color: rgba(25, 118, 210, 0.08);
+  color: #1976d2;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 16px;
+  padding: 2px 10px;
+  margin-left: 6px;
+  line-height: 20px;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  transform: translateY(-1px);
+  animation: fadeInChip 0.25s ease-out;
+}
+

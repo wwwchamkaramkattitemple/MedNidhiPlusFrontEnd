@@ -1,0 +1,184 @@
+<div class="patient-detail-container">
+  <div class="patient-detail-header">
+    <h1 class="mat-headline-4">Patient Details</h1>
+    <div class="header-actions">
+      <button mat-button color="primary mr-5" routerLink="/patients">
+        <mat-icon>arrow_back</mat-icon> Back to Patients
+      </button>
+      <button mat-raised-button color="primary mr-5" [routerLink]="['/patients', patientId, 'edit']">
+        <mat-icon>edit</mat-icon> Edit
+      </button>
+      <button mat-raised-button color="warn" (click)="deletePatient()">
+        <mat-icon>delete</mat-icon> Delete
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-spinner">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <div *ngIf="!isLoading && patient" class="patient-content">
+    <mat-card class="patient-info-card">
+      <mat-card-header>
+        <mat-card-title>{{ getFullName() }}</mat-card-title>
+        <mat-card-subtitle>{{ patient.email }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Phone</div>
+            <div class="info-value">{{ patient.phoneNumber }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Date of Birth</div>
+            <div class="info-value">{{ patient.dateOfBirth | date:'MMM d, y' }} ({{ getAge() }} years)</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Address</div>
+            <div class="info-value">{{ patient.address }}, {{ patient.city }}, {{ patient.state }} {{ patient.zipCode }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Insurance</div>
+            <div class="info-value">{{ patient.insuranceProvider }} (Policy #: {{ patient.insurancePolicyNumber }})</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Patient Since</div>
+            <div class="info-value">{{ patient.createdAt | date:'MMM d, y' }}</div>
+          </div>
+          <div class="info-item full-width">
+            <div class="info-label">Medical History</div>
+            <div class="info-value">{{ patient.medicalHistory || 'No medical history recorded' }}</div>
+          </div>
+          
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Appointments Section -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Appointments</mat-card-title>
+        <button mat-button color="primary" [routerLink]="['/appointments/new']" [queryParams]="{patientId: patientId}">
+          <mat-icon>add</mat-icon> New Appointment
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="appointments" class="mat-elevation-z0 full-width">
+          <!-- Date Column -->
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef> Date & Time </th>
+            <td mat-cell *matCellDef="let appointment"> 
+              {{ appointment.date | date:'MMM d, y' }} at {{ appointment.time }} 
+            </td>
+          </ng-container>
+
+          <!-- Type Column -->
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef> Type </th>
+            <td mat-cell *matCellDef="let appointment"> {{ appointment.type }} </td>
+          </ng-container>
+
+          <!-- Doctor Column -->
+          <ng-container matColumnDef="doctor">
+            <th mat-header-cell *matHeaderCellDef> Doctor </th>
+            <td mat-cell *matCellDef="let appointment"> {{ appointment.doctorName }} </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef> Status </th>
+            <td mat-cell *matCellDef="let appointment"> 
+              <mat-chip [color]="getStatusColor(appointment.status)" selected>
+                {{ appointment.status }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Actions </th>
+            <td mat-cell *matCellDef="let appointment">
+              <button mat-icon-button [routerLink]="['/appointments', appointment.id]" matTooltip="View Details">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button [routerLink]="['/appointments', appointment.id, 'edit']" matTooltip="Edit">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['date', 'type', 'doctor', 'status', 'actions']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['date', 'type', 'doctor', 'status', 'actions'];"></tr>
+
+          <!-- Row shown when there is no matching data. -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="5">No appointments found for this patient</td>
+          </tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Invoices Section -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Invoices</mat-card-title>
+        <button mat-button color="primary" [routerLink]="['/billing/new']" [queryParams]="{patientId: patientId}">
+          <mat-icon>add</mat-icon> New Invoice
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="invoices" class="mat-elevation-z0 full-width">
+          <!-- Invoice Number Column -->
+          <ng-container matColumnDef="invoiceNumber">
+            <th mat-header-cell *matHeaderCellDef> Invoice # </th>
+            <td mat-cell *matCellDef="let invoice"> {{ invoice.invoiceNumber }} </td>
+          </ng-container>
+
+          <!-- Date Column -->
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef> Date </th>
+            <td mat-cell *matCellDef="let invoice"> {{ invoice.date | date:'MMM d, y' }} </td>
+          </ng-container>
+
+          <!-- Amount Column -->
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef> Amount </th>
+            <td mat-cell *matCellDef="let invoice"> &nbsp;&#8377;&nbsp;{{ invoice.amount  }} </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef> Status </th>
+            <td mat-cell *matCellDef="let invoice"> 
+              <mat-chip [color]="getStatusColor(invoice.status)" selected>
+                {{ invoice.status }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Actions </th>
+            <td mat-cell *matCellDef="let invoice">
+              <button mat-icon-button [routerLink]="['/billing', invoice.id]" matTooltip="View Details">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button [routerLink]="['/billing', invoice.id, 'edit']" matTooltip="Edit">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['invoiceNumber', 'date', 'amount', 'status', 'actions']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['invoiceNumber', 'date', 'amount', 'status', 'actions'];"></tr>
+
+          <!-- Row shown when there is no matching data. -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="5">No invoices found for this patient</td>
+          </tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

@@ -1,0 +1,110 @@
+<div class="doctor-form-container">
+    <div class="doctor-form-header">
+        <h1 class="mat-headline-4">{{ isEditMode ? 'Edit' : 'New' }} Doctor</h1>
+        <button mat-button color="primary" (click)="cancel()">
+            <mat-icon>arrow_back</mat-icon> Back to Doctors
+        </button>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-spinner">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <form *ngIf="!isLoading" [formGroup]="doctorForm" (ngSubmit)="onSubmit()">
+        <mat-card>
+            <mat-card-content>
+
+                <div class="form-row">
+                    <!-- Doctor Name -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Doctor Name</mat-label>
+                        <input matInput formControlName="doctorName" required />
+                        <mat-error *ngIf="doctorForm.get('doctorName')?.hasError('required')">
+                            Doctor name is required
+                        </mat-error>
+                    </mat-form-field>
+
+                    <!-- Department -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Department</mat-label>
+                        <mat-select formControlName="departmentId" required>
+                            <mat-option value="">-- Select Department --</mat-option>
+                            <mat-option *ngFor="let dept of departments" [value]="dept.id">
+                                {{ dept.departmentName }}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="doctorForm.get('departmentId')?.hasError('required')">
+                            Department is required
+                        </mat-error>
+                    </mat-form-field>
+
+
+                    <!-- Qualification -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Qualification</mat-label>
+                        <input matInput formControlName="qualification" placeholder="e.g., MBBS, MD" />
+                    </mat-form-field>
+
+                    <!-- Active Checkbox -->
+                    <div class="checkbox-field">
+                        <mat-checkbox formControlName="isActive">Active</mat-checkbox>
+                    </div>
+                </div>
+
+                <div class="form-row">
+
+                   
+
+                    <!-- Revisit Days -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Revisit Days</mat-label>
+                        <input matInput type="number" formControlName="revisitDays" placeholder="e.g., 15" />
+                        <mat-error *ngIf="doctorForm.get('revisitDays')?.hasError('min')">
+                            Must be at least 1 day
+                        </mat-error>
+                    </mat-form-field>
+
+                     <!-- Consultation Fee -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Consultation Fee</mat-label>
+                        <input matInput type="number" formControlName="consultationFee" placeholder="e.g., 500" min="100" />
+                        <mat-error *ngIf="doctorForm.get('consultationFee')?.hasError('min')">
+                            Fee must be at least 0
+                        </mat-error>
+                    </mat-form-field>
+
+                    <!-- Mobile Number -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Mobile Number</mat-label>
+                        <input matInput formControlName="mobileNumber" placeholder="e.g., 9876543210" />
+                    </mat-form-field>
+
+                    <!-- Email -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Email</mat-label>
+                        <input matInput type="email" formControlName="email" placeholder="e.g., dr.john@example.com" />
+                        <mat-error *ngIf="doctorForm.get('email')?.hasError('email')">
+                            Invalid email address
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                    <!-- Specialization -->
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Specialization</mat-label>
+                        <textarea matInput formControlName="specialization" rows="2"></textarea>
+                    </mat-form-field>
+                </div>
+
+            </mat-card-content>
+
+            <mat-card-actions align="end">
+                <button mat-button type="button" class="mr-5" (click)="cancel()">Cancel</button>
+                <button mat-raised-button color="primary" type="submit" [disabled]="doctorForm.invalid">
+                    {{ isEditMode ? 'Update' : 'Save' }} Doctor
+                </button>
+            </mat-card-actions>
+        </mat-card>
+    </form>
+</div>

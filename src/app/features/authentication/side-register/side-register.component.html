@@ -1,0 +1,95 @@
+<div class="login-container">
+  <div class="login-card">
+
+    <!-- Left Side: Login Form -->
+    <div class="login-illustration">
+
+       <div class="logo">
+        <img src="assets/mednidhi-logo.png" alt="MedNidhi+ Logo" />
+      </div>
+
+      <div class="illustration-content">
+        <img src="assets/signup-illustration.png" alt="Fingerprint Illustration" />
+        <p class="illustration-text">Please enter your details to register an account.</p>
+      </div>
+    </div>
+
+    <!-- Right Side: Illustration -->
+    <div class="login-form">
+      <!-- <div class="logo">
+        <img src="assets/logo.svg" alt="Finnger Logo" />
+        <span class="logo-text">Finnger</span>
+      </div> -->
+
+      <h1 class="title">Get Started</h1>
+      <p class="subtitle">Welcome to Management system - Let's create an account.</p>
+
+      <form (ngSubmit)="submit()" [formGroup]="form">
+
+        <div class="row">
+          <div class="col-md-6">
+            <div>
+              <mat-form-field appearance="outline">
+                <mat-label>First Name</mat-label>
+                <input matInput formControlName="firstName" required>
+                <mat-error *ngIf="form.get('firstName')?.hasError('required')">
+                  First Name is required
+                </mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div>
+              <mat-form-field appearance="outline">
+                <mat-label>Last Name</mat-label>
+                <input matInput formControlName="lastName" required>
+                <mat-error *ngIf="form.get('lastName')?.hasError('required')">
+                  Last Name is required
+                </mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Username</mat-label>
+            <input matInput formControlName="username" required>
+            <mat-error *ngIf="form.get('username')?.hasError('required')">
+              Username is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" required>
+            <mat-error *ngIf="form.get('email')?.hasError('required')">
+              Email is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Password</mat-label>
+            <input matInput formControlName="password" required>
+            <mat-error *ngIf="form.get('password')?.hasError('required')">
+              Password is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <button type="submit" class="btn-signin">Sign Up</button>
+      </form>
+
+      <span class="d-block f-w-500 text-center m-t-24 ">Already have an Account?
+        <a href="#" (click)="goSignIn($event)" class="text-decoration-none f-w-500 f-s-14">
+          Sign In
+        </a>
+      </span>
+
+    </div>
+  </div>
+</div>

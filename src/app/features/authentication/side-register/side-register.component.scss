@@ -1,0 +1,171 @@
+/* ---------- Layout container ---------- */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #f3f4f8;
+  padding: 20px;
+}
+
+/* ---------- Main card (2 columns) ---------- */
+.login-card {
+  display: flex;
+  flex-direction: row;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  max-width: 1000px;
+  width: 100%;
+}
+
+/* ==========================================================
+   LEFT SIDE: ILLUSTRATION + LOGO
+   ========================================================== */
+.login-illustration {
+  flex: 1;
+  background: linear-gradient(135deg, #3e1782, #3f51b5);
+  display: flex;
+  flex-direction: column;        /* stack logo above illustration */
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+
+.login-illustration .logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+  animation: fadeInUp 1.2s ease-out;
+}
+
+.login-illustration .logo img {
+  width: 220px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
+  transition: transform 0.3s ease;
+}
+
+.login-illustration .logo img:hover {
+  transform: scale(1.05);
+}
+
+/* --- Illustration Content --- */
+.illustration-content {
+  text-align: center;
+  animation: fadeIn 1.5s ease-out 0.3s both;
+}
+
+.illustration-content img {
+  max-width: 250px;
+  margin-bottom: 20px;
+  border-radius: 16px;
+  opacity: 0.95;
+  animation: float 4s ease-in-out infinite;
+}
+
+.illustration-text {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #f0f0f0;
+  margin-top: 10px;
+}
+
+/* ---------- Animations ---------- */
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+/* ==========================================================
+   RIGHT SIDE: LOGIN FORM
+   ========================================================== */
+.login-form {
+  flex: 1;
+  padding: 60px 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* --- Title and Subtitle --- */
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: #777;
+  margin-bottom: 40px;
+}
+
+/* --- Form Rows --- */
+.form-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.form-row mat-form-field {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* --- Sign-in Button --- */
+.btn-signin {
+  width: 100%;
+  padding: 14px 0;
+  background: linear-gradient(90deg, #3f51b5, #320c9b);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  margin-top: 10px;
+}
+
+.btn-signin:hover {
+  opacity: 0.9;
+}
+
+/* ==========================================================
+   RESPONSIVE DESIGN
+   ========================================================== */
+@media (max-width: 768px) {
+  .login-card {
+    flex-direction: column;
+  }
+
+  .login-illustration {
+    padding: 30px 20px;
+  }
+
+  .illustration-content img {
+    max-width: 200px;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+}

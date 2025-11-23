@@ -1,0 +1,68 @@
+<div class="department-form-container">
+    <div class="department-form-header">
+        <h1 class="mat-headline-4">{{ isEditMode ? 'Edit' : 'New' }} Department</h1>
+        <button mat-button color="primary" (click)="cancel()">
+            <mat-icon>arrow_back</mat-icon> Back to Departments
+        </button>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-spinner">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <form *ngIf="!isLoading" [formGroup]="departmentForm" (ngSubmit)="onSubmit()">
+        <mat-card>
+            <mat-card-content>
+
+                <div class="form-row">
+                    <!-- Department Name -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Department Name</mat-label>
+                        <input matInput formControlName="departmentName" required />
+                        <mat-error *ngIf="departmentForm.get('departmentName')?.hasError('required')">
+                            Department name is required
+                        </mat-error>
+                    </mat-form-field>
+
+                    <!-- Default Revisit Days -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Default Revisit Days</mat-label>
+                        <input matInput type="number" formControlName="defaultRevisitDays" placeholder="e.g., 15" />
+                        <mat-error *ngIf="departmentForm.get('defaultRevisitDays')?.hasError('min')">
+                            Must be at least 1 day
+                        </mat-error>
+                    </mat-form-field>
+
+                    <!-- Default Consultation Fee -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Default Consultation Fee</mat-label>
+                        <input matInput type="number" placeholder="e.g., 500"
+                            formControlName="defaultConsultationFee" />
+                    </mat-form-field>
+
+                    <!-- Active Checkbox -->
+                    <div class="checkbox-field">
+                        <mat-checkbox formControlName="isActive">Active</mat-checkbox>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <!-- Description -->
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Description</mat-label>
+                        <textarea matInput formControlName="description" rows="2"></textarea>
+                    </mat-form-field>
+                </div>
+
+            </mat-card-content>
+
+            <mat-card-actions align="end">
+                <button mat-button type="button" (click)="cancel()">Cancel</button>
+                <button mat-raised-button color="primary" type="submit" [disabled]="departmentForm.invalid">
+                    {{ isEditMode ? 'Update' : 'Save' }} Department
+                </button>
+            </mat-card-actions>
+        </mat-card>
+    </form>
+
+</div>

@@ -1,0 +1,137 @@
+<div class="patient-form-container">
+  <div class="patient-form-header">
+    <h1 class="mat-headline-4">{{ isEditMode ? 'Edit' : 'New' }} Patient</h1>
+    <button mat-button color="primary " (click)="cancel()">
+      <mat-icon>arrow_back</mat-icon> Back to Patients
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-spinner">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <form *ngIf="!isLoading" [formGroup]="patientForm" (ngSubmit)="onSubmit()">
+    <mat-card>
+      <mat-card-content>
+
+        <div class="form-row-mode">
+          <mat-form-field appearance="outline">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="firstName" required>
+            <mat-error *ngIf="patientForm.get('firstName')?.hasError('required')">
+              First name is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="lastName" required>
+            <mat-error *ngIf="patientForm.get('lastName')?.hasError('required')">
+              Last name is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Gender</mat-label>
+            <mat-select formControlName="gender" required>
+              <mat-option value="">Select Gender</mat-option>
+              <mat-option value="Male">Male</mat-option>
+              <mat-option value="Female">Female</mat-option>
+              <mat-option value="Other">Other</mat-option>
+            </mat-select>
+            <mat-error *ngIf="patientForm.get('gender')?.hasError('required')">
+              Gender is required
+            </mat-error>
+          </mat-form-field>
+
+        </div>
+
+        <div class="form-row">
+
+          <mat-form-field appearance="outline">
+            <mat-label>Date of Birth</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="dateOfBirth" [max]="maxDate" required>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error *ngIf="patientForm.get('dateOfBirth')?.hasError('required')">
+              Date of birth is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Phone Number</mat-label>
+            <input matInput formControlName="phoneNumber" required>
+            <mat-error *ngIf="patientForm.get('phoneNumber')?.hasError('required')">
+              Phone Number is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" type="email">
+            <mat-error *ngIf="patientForm.get('email')?.hasError('email')">
+              Please enter a valid email address
+            </mat-error>
+          </mat-form-field>
+
+
+
+        </div>
+
+        <div class="form-row">
+
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Address</mat-label>
+            <input matInput formControlName="address">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>City</mat-label>
+            <input matInput formControlName="city">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>State</mat-label>
+            <input matInput formControlName="state">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Zip Code</mat-label>
+            <input matInput formControlName="zipCode">
+          </mat-form-field>
+
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Medical History</mat-label>
+            <textarea matInput formControlName="medicalHistory" rows="3"></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Insurance Provider</mat-label>
+            <input matInput formControlName="insuranceProvider">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Insurance Policy Number</mat-label>
+            <input matInput formControlName="insurancePolicyNumber">
+          </mat-form-field>
+        </div>
+
+
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button mat-button type="button" class="mr-5" (click)="cancel()">Cancel</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="patientForm.invalid">
+          {{ isEditMode ? 'Update' : 'Save' }} Patient
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </form>
+
+</div>

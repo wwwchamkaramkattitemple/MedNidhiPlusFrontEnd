@@ -1,0 +1,146 @@
+.invoice-form-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .invoice-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    h1 {
+      margin: 0;
+    }
+  }
+
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    padding: 50px 0;
+  }
+
+  mat-card {
+    margin-bottom: 20px;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    mat-form-field {
+      flex: 1;
+    }
+
+    .description-field {
+      flex: 2;
+    }
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  .items-card {
+    .header-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-top: 8px;
+
+      mat-form-field {
+        width: 300px;
+      }
+    }
+
+    .invoice-item {
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 16px;
+      margin-bottom: 16px;
+
+      .item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+
+        h3 {
+          margin: 0;
+          font-weight: 500;
+        }
+      }
+    }
+
+    .no-items {
+      padding: 20px;
+      text-align: center;
+      color: #666;
+      font-style: italic;
+    }
+  }
+
+  .totals-card {
+    .totals-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+
+      .total-row {
+        display: flex;
+        align-items: center;
+
+        .total-label {
+          width: 120px;
+          font-weight: 500;
+        }
+
+        .total-value {
+          flex: 1;
+
+          mat-form-field {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 960px) {
+  .invoice-form-container {
+    .form-row {
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .items-card {
+      .header-actions {
+        flex-direction: column;
+        align-items: flex-start;
+
+        mat-form-field {
+          width: 100%;
+        }
+      }
+    }
+
+    .totals-card {
+      .totals-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .invoice-form-container {
+    .invoice-form-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+  }
+}

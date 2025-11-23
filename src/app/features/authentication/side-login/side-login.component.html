@@ -1,0 +1,65 @@
+<div class="login-container">
+  <div class="login-card">
+
+
+
+    <!-- Left Side: Login Form -->
+
+
+    <div class="login-illustration">
+
+      <div class="logo">
+        <img src="assets/mednidhi-logo.png" alt="MedNidhi+ Logo" />
+      </div>
+
+      <div class="illustration-content">
+        <img src="assets/auth-illustration.png" alt="Fingerprint Illustration" />
+        <p class="illustration-text">Please enter your credentials to login.</p>
+      </div>
+
+    </div>
+
+
+    <!-- Right Side: Illustration -->
+    <div class="login-form">
+      <!-- <div class="logo">
+        <img src="assets/logo.svg" alt="Finnger Logo" />
+        <span class="logo-text">Finnger</span>
+      </div> -->
+
+      <h1 class="title">Holla, Welcome </h1>
+      <p class="subtitle">Hey, welcome back to your special place</p>
+
+      <form (ngSubmit)="submit()" [formGroup]="form">
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Username</mat-label>
+            <input matInput formControlName="username" required>
+            <mat-error *ngIf="form.get('username')?.hasError('required')">
+              Username is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Password</mat-label>
+            <input type="password" matInput formControlName="password" required>
+            <mat-error *ngIf="form.get('password')?.hasError('required')">
+              Password is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <button type="submit" class="btn-signin">Sign In</button>
+      </form>
+
+      <span class="d-block f-w-500 text-center m-t-24 ">New to Management System?
+        <a href="#" (click)="goRegister($event)" class="text-decoration-none f-w-500 f-s-14">
+          Sign Up
+        </a>
+      </span>
+
+    </div>
+  </div>
+</div>

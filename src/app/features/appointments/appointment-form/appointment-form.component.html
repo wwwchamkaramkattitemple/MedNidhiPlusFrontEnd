@@ -1,0 +1,182 @@
+<div class="appointment-form-container">
+  <div class="appointment-form-header">
+    <h1 class="mat-headline-4">{{ isEditMode ? 'Edit' : 'New' }} Appointment</h1>
+    <button mat-button color="primary" (click)="cancel()">
+      <mat-icon>arrow_back</mat-icon> Back to Appointments
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-spinner">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+    <mat-card>
+      <mat-card-content>
+        <div class="form-row-mode">
+
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Patient</mat-label>
+
+            <input type="text" matInput placeholder="Search patient" [matAutocomplete]="auto"
+              [value]="getPatientNameById(appointmentForm.get('patientId')?.value)" (input)="onPatientSearch($event)"
+              required />
+
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onPatientSelected($event.option.value)"
+              autoActiveFirstOption>
+              <mat-option *ngFor="let patient of filteredPatients" [value]="patient.id">
+                <div class="flex flex-col">
+                  <span matTooltip="{{ patient.firstName }} {{ patient.lastName }}" matTooltipPosition="right">
+                    {{ patient.firstName }} {{ patient.lastName }}
+                  </span>
+                  <small class="text-muted">({{ patient.phoneNumber }})</small>
+                </div>
+              </mat-option>
+
+              <mat-option *ngIf="filteredPatients.length === 0" disabled>
+                No patients available
+              </mat-option>
+            </mat-autocomplete>
+
+            <mat-error *ngIf="appointmentForm.get('patientId')?.hasError('required')">
+              Patient is required
+            </mat-error>
+
+
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Doctor</mat-label>
+
+            <span *ngIf="selectedDoctor" matPrefix>&nbsp;&nbsp;Dr.&nbsp;</span>
+
+            <input type="text" matInput placeholder="Search doctor" [matAutocomplete]="autoDoctor"
+              [value]="getDoctorNameById(appointmentForm.get('doctorId')?.value)" (input)="onDoctorSearch($event)"
+              required />
+
+            <span *ngIf="selectedDoctor" matSuffix>
+              <span class="dept-chip">{{ selectedDoctor.departmentName }}</span>&nbsp;&nbsp;&nbsp;
+            </span>
+
+            <mat-autocomplete #autoDoctor="matAutocomplete" (optionSelected)="onDoctorSelected($event.option.value)"
+              autoActiveFirstOption>
+              <mat-option *ngFor="let doctor of filteredDoctors" [value]="doctor.id">
+                <div class="flex flex-col">
+                  <span matTooltip="{{ doctor.doctorName }}" matTooltipPosition="right">
+                    {{ doctor.doctorName }}
+                  </span>
+                  <small class="text-muted">({{ doctor.departmentName }})</small>
+                </div>
+
+              </mat-option>
+
+              <mat-option *ngIf="filteredDoctors.length === 0" disabled>
+                No doctors available
+              </mat-option>
+            </mat-autocomplete>
+
+            <mat-error *ngIf="appointmentForm.get('doctorId')?.hasError('required')">
+              Doctor is required
+            </mat-error>
+
+
+          </mat-form-field>
+
+
+          <mat-form-field appearance="outline">
+            <mat-label>Appointment Type</mat-label>
+            <mat-select formControlName="appointmentTypeId" required>
+              <mat-option *ngFor="let type of appointmentTypes" [value]="type.id">
+                {{ type.typeName }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="appointmentForm.get('appointmentTypeId')?.hasError('required')">
+              Appointment type is required
+            </mat-error>
+          </mat-form-field>
+
+
+        </div>
+
+
+
+        <div class="form-row">
+
+          <mat-form-field appearance="outline">
+            <mat-label>Appointment Date</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="appointmentDate" required>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error *ngIf="appointmentForm.get('appointmentDate')?.hasError('required')">
+              Date is required
+            </mat-error>
+          </mat-form-field>
+
+
+           <mat-form-field appearance="outline">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="statusId" required>
+              <mat-option *ngFor="let status of appointmentStatuses" [value]="status.id">
+                {{ status.statusName }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="appointmentForm.get('statusId')?.hasError('required')">
+              Status is required
+            </mat-error>
+          </mat-form-field>
+
+
+          
+
+          <mat-form-field appearance="outline">
+            <mat-label>Fee</mat-label>
+            <input matInput type="number" formControlName="fee" required>
+            <span matPrefix>&nbsp;&#8377;&nbsp;</span>
+            <mat-error *ngIf="appointmentForm.get('fee')?.hasError('required')">
+              Fee is required
+            </mat-error>
+            <mat-error *ngIf="appointmentForm.get('fee')?.hasError('min')">
+              Fee cannot be negative
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Appointment Time</mat-label>
+            <input matInput [ngxMatTimepicker]="timePicker" formControlName="appointmentTime" readonly required>
+            <ngx-mat-timepicker #timePicker></ngx-mat-timepicker>
+            <mat-error *ngIf="appointmentForm.get('appointmentTime')?.hasError('required')">
+              Time is required
+            </mat-error>
+          </mat-form-field>
+
+         
+
+
+
+          <div class="checkbox-field">
+            <mat-checkbox formControlName="isBilled">Appointment has been billed</mat-checkbox>
+          </div>
+
+        </div>
+
+
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Notes</mat-label>
+            <textarea matInput formControlName="notes" rows="4"></textarea>
+          </mat-form-field>
+        </div>
+
+
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button mat-button type="button" class="mr-5" (click)="cancel()">Cancel</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="appointmentForm.invalid">
+          {{ isEditMode ? 'Update' : 'Create' }} Appointment
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </form>
+</div>

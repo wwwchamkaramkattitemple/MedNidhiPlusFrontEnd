@@ -1,0 +1,114 @@
+<div class="dashboard-container">
+  <div *ngIf="isLoading" class="loading-spinner">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <div *ngIf="!isLoading" class="dashboard-content">
+    <h1 class="mat-headline-4">Dashboard</h1>
+
+    <!-- Stats Cards -->
+    <div class="stats-cards">
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-value">{{ stats.totalPatients }}</div>
+          <div class="stat-label">Total Patients</div>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button color="primary" routerLink="/patients">View All</button>
+        </mat-card-actions>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-value">{{ stats.appointmentsToday }}</div>
+          <div class="stat-label">Today's Appointments</div>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button color="primary" routerLink="/appointments">View All</button>
+        </mat-card-actions>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-value">{{ stats.pendingInvoices }}</div>
+          <div class="stat-label">Pending Invoices</div>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button color="primary" routerLink="/billing">View All</button>
+        </mat-card-actions>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-value">&#8377; {{ stats.revenueThisMonth }}</div>
+          <div class="stat-label">Revenue This Month</div>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button color="primary" routerLink="/reports">View Reports</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="recent-activity">
+      <!-- Recent Appointments -->
+      <mat-card class="activity-card">
+        <mat-card-header>
+          <mat-card-title>Recent Appointments</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-list>
+            <mat-list-item *ngFor="let appointment of recentAppointments">
+              <div matListItemTitle>{{ appointment.patientName }}</div>
+              <div matListItemLine>
+                {{ appointment.date | date:'MMM d, y' }} at {{ appointment.time }} - {{ appointment.type }}
+              </div>
+              <div matListItemMeta>
+                <!-- <mat-chip [color]="getStatusColor(appointment.status)" selected>{{ appointment.status }}</mat-chip> -->
+                <mat-chip #chip>
+                <span class="mat-chip-content" [style.color]="getStatusColor(appointment.status)">
+                  {{ appointment.status }}
+                </span>
+              </mat-chip>
+              </div>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button color="primary" routerLink="/appointments">View All Appointments</button>
+        </mat-card-actions>
+      </mat-card>
+
+      <!-- Recent Invoices -->
+      <mat-card class="activity-card">
+        <mat-card-header>
+          <mat-card-title>Recent Invoices</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-list>
+            <mat-list-item *ngFor="let invoice of recentInvoices">
+              <div matListItemTitle>{{ invoice.patientName }}</div>
+              <div matListItemLine>
+                {{ invoice.date | date:'MMM d, y' }} - &#8377;{{ invoice.amount }}
+              </div>
+              <div matListItemMeta>
+                <!-- <mat-chip  [color]="getStatusColor(invoice.status)" selected>{{ invoice.status }}</mat-chip> -->
+              <mat-chip #chip>
+                <span class="mat-chip-content" [style.color]="getStatusColor(invoice.status)">
+                  {{ invoice.status }}
+                </span>
+              </mat-chip>
+
+                
+
+              </div>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button color="primary" routerLink="/billing">View All Invoices</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+</div>

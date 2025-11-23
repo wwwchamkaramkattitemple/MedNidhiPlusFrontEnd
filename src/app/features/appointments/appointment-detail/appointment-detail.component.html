@@ -1,0 +1,77 @@
+<div class="appointment-detail-container">
+  <div class="appointment-detail-header">
+    <h1 class="mat-headline-4">Appointment Details</h1>
+    <div class="header-actions">
+      <button mat-button color="primary" routerLink="/appointments">
+        <mat-icon>arrow_back</mat-icon> Back to Appointments
+      </button>
+      <button mat-raised-button color="primary" [routerLink]="['/appointments', appointmentId, 'edit']">
+        <mat-icon>edit</mat-icon> Edit
+      </button>
+      <button mat-raised-button color="warn" (click)="deleteAppointment()">
+        <mat-icon>delete</mat-icon> Delete
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-spinner">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <div *ngIf="!isLoading && appointment" class="appointment-content">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>
+          {{ appointment.appointmentType }} - {{ appointment.appointmentDate | date:'MMM d, y' }} at {{ appointment.appointmentTime }}
+        </mat-card-title>
+        <mat-card-subtitle>
+          <mat-chip [color]="getStatusColor(appointment.status)" selected>
+            {{ appointment.status }}
+          </mat-chip>
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Patient</div>
+            <div class="info-value">
+              <a [routerLink]="['/patients', appointment.patientId]">{{ appointment.patientName }}</a>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Doctor</div>
+            <div class="info-value">{{ appointment.doctorName }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Fee</div>
+            <div class="info-value">{{ appointment.fee | currency }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Billing Status</div>
+            <div class="info-value">
+              <span *ngIf="appointment.isBilled">Billed</span>
+              <span *ngIf="!appointment.isBilled">Not Billed</span>
+              <button *ngIf="!appointment.isBilled" mat-button color="primary" class="ml-5" (click)="createInvoice()">
+                <mat-icon>receipt</mat-icon> Create Invoice
+              </button>
+            </div>
+          </div>
+          <div class="info-item full-width">
+            <div class="info-label">Notes</div>
+            <div class="info-value notes-content">
+              {{ appointment.notes || 'No notes available' }}
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Created</div>
+            <div class="info-value">{{ appointment.createdAt | date:'MMM d, y, h:mm a' }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Last Updated</div>
+            <div class="info-value">{{ appointment.updatedAt | date:'MMM d, y, h:mm a' }}</div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
