@@ -17,16 +17,34 @@
       </mat-card-header>
       <mat-card-content>
         <div class="form-row">
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" class="w-100">
             <mat-label>Patient</mat-label>
-            <mat-select formControlName="patientId" required (selectionChange)="onPatientChange($event.value)">
-              <mat-option *ngFor="let patient of patients" [value]="patient.id">
-                {{ patient.firstName }} {{ patient.lastName }}
+
+            <input type="text" matInput placeholder="Search patient" [matAutocomplete]="auto"
+              [value]="getPatientNameById(invoiceForm.get('patientId')?.value)" (input)="onPatientSearch($event)"
+              required />
+
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onPatientSelected($event.option.value)"
+              autoActiveFirstOption>
+              <mat-option *ngFor="let patient of filteredPatients" [value]="patient.id">
+                <div class="flex flex-col">
+                  <span matTooltip="{{ patient.firstName }} {{ patient.lastName }}" matTooltipPosition="right">
+                    {{ patient.firstName }} {{ patient.lastName }}
+                  </span>
+                  <small class="text-muted">({{ patient.phoneNumber }})</small>
+                </div>
               </mat-option>
-            </mat-select>
+
+              <mat-option *ngIf="filteredPatients.length === 0" disabled>
+                No patients available
+              </mat-option>
+            </mat-autocomplete>
+
             <mat-error *ngIf="invoiceForm.get('patientId')?.hasError('required')">
               Patient is required
             </mat-error>
+
+
           </mat-form-field>
 
           <mat-form-field appearance="outline">

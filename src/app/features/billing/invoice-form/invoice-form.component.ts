@@ -5,14 +5,15 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MaterialModule } from "../../../material.module";
 import { CommonModule } from '@angular/common';
 import { FormsModule,ReactiveFormsModule } from '@angular/forms';
-
+import { PatientService } from '../../../../services/patient.service';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 @Component({
   selector: 'app-invoice-form',
   standalone:true,
   templateUrl: './invoice-form.component.html',
   styleUrls: ['./invoice-form.component.scss'],
-  imports: [MaterialModule,CommonModule,FormsModule,ReactiveFormsModule]
+  imports: [MaterialModule,CommonModule,FormsModule,ReactiveFormsModule,MatAutocompleteModule]
 })
 export class InvoiceFormComponent implements OnInit {
   invoiceForm!: FormGroup;
@@ -20,6 +21,7 @@ export class InvoiceFormComponent implements OnInit {
   invoiceId: number | null = null;
   isLoading = false;
   patients: any[] = [];
+  filteredPatients: any[] = [];
   appointments: any[] = [];
   invoiceStatuses = [
     'Pending',
@@ -41,7 +43,8 @@ export class InvoiceFormComponent implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private patientService: PatientService,
   ) { }
 
   ngOnInit(): void {
@@ -96,20 +99,56 @@ export class InvoiceFormComponent implements OnInit {
     this.addInvoiceItem();
   }
 
+  // loadPatients(): void {
+  //   // Simulate API call
+  //   this.isLoading = true;
+  //   setTimeout(() => {
+  //     // Mock data - replace with actual API call
+  //     this.patients = [
+  //       { id: 1, firstName: 'John', lastName: 'Doe' },
+  //       { id: 2, firstName: 'Jane', lastName: 'Smith' },
+  //       { id: 3, firstName: 'Robert', lastName: 'Brown' },
+  //       { id: 4, firstName: 'Emily', lastName: 'Davis' },
+  //       { id: 5, firstName: 'Michael', lastName: 'Wilson' }
+  //     ];
+  //     this.isLoading = false;
+  //   }, 500);
+  // }
+
   loadPatients(): void {
-    // Simulate API call
     this.isLoading = true;
     setTimeout(() => {
-      // Mock data - replace with actual API call
-      this.patients = [
-        { id: 1, firstName: 'John', lastName: 'Doe' },
-        { id: 2, firstName: 'Jane', lastName: 'Smith' },
-        { id: 3, firstName: 'Robert', lastName: 'Brown' },
-        { id: 4, firstName: 'Emily', lastName: 'Davis' },
-        { id: 5, firstName: 'Michael', lastName: 'Wilson' }
-      ];
+      this.patientService.getAllPatients().subscribe({
+        next: (patients) => {
+          this.patients = patients;
+          this.filteredPatients = patients;
+        },
+        error: (err) => console.error('Failed to load patients', err)
+      });
+
       this.isLoading = false;
     }, 500);
+  }
+
+  onPatientSearch(event: Event): void {
+    const input = (event.target as HTMLInputElement).value?.toLowerCase() || '';
+    this.filteredPatients = this.patients.filter(patient =>
+      `${patient.firstName} ${patient.lastName} ${patient.phoneNumber}`.toLowerCase().includes(input)
+    );
+
+    // Optional: clear stale selection if no matches
+    if (this.filteredPatients.length === 0) {
+      this.invoiceForm.patchValue({ patientId: null });
+    }
+  }
+
+  onPatientSelected(patientId: number): void {
+    this.invoiceForm.patchValue({ patientId });
+  }
+
+  getPatientNameById(id: number): string {
+    const patient = this.patients.find(p => p.id === id);
+    return patient ? `${patient.firstName} ${patient.lastName}` : '';
   }
 
   onPatientChange(patientId: number): void {
