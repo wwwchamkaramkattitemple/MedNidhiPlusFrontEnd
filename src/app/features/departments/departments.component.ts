@@ -83,7 +83,6 @@ export class DepartmentsComponent implements OnInit {
     setTimeout(() => {
       this.departmentService.getAlldepartments().subscribe(
         (data) => {
-          console.log(data);
           this.dataSource.data = data;
           this.dataSource.paginator = this.paginator;
         }
