@@ -9,7 +9,6 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/c
 import { MaterialModule } from "../../material.module";
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { departmentService } from '../../../services/department.service';
 import { ProcedureService } from '../../../services/procedure.service';
 
 interface Department {

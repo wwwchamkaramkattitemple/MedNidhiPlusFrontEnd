@@ -23,6 +23,8 @@ import { MedicinesComponent } from './features/medicines/medicines.component';
 import { MedicineFormComponent } from './features/medicines/medicine-form/medicine-form.component';
 import { ProceduresComponent } from './features/procedures/procedures.component';
 import { ProcedureFormComponent } from './features/procedures/procedure-form/procedure-form.component';
+import { MedicineCategoryComponent } from './features/medicine-category/medicine-category.component';
+import { MedicineCategoryFormComponent } from './features/medicine-category/medicine-category-form/medicine-category-form.component';
 // import { ProcessfilesComponent } from './features/processfiles/processfiles.component';
 
 export const appRoutes: Routes = [
@@ -89,6 +91,12 @@ export const appRoutes: Routes = [
   { path: 'medicines', component: MedicinesComponent },
   { path: 'medicines/new', component: MedicineFormComponent },
   { path: 'medicines/:id/edit', component: MedicineFormComponent },
+
+  // Medicine Category routes
+  { path: 'medicine-category', component: MedicineCategoryComponent },
+  { path: 'medicine-category/new', component: MedicineCategoryFormComponent },
+  { path: 'medicine-category/:id/edit', component: MedicineCategoryFormComponent },
+
 
    // Procedure routes
   { path: 'procedures', component: ProceduresComponent },

@@ -50,4 +50,5 @@ export class ProcedureService {
         }
         return new HttpHeaders({ 'Authorization': `Bearer ${this.token}` });
     }
+
 }

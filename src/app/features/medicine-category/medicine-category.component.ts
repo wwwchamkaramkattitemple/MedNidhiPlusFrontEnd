@@ -4,34 +4,23 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MedicineService } from '../../../services/medicine.service';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MaterialModule } from '../../material.module';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { MedicineCategoryService } from '../../../services/medicine-category.service';
 
 
 @Component({
-  selector: 'app-medicine-list',
-  templateUrl: './medicines.component.html',
-  styleUrls: ['./medicines.component.scss'],
+  selector: 'app-medicine-category',
+  templateUrl: './medicine-category.component.html',
+  styleUrls: ['./medicine-category.component.scss'],
    standalone: true,
   imports: [MaterialModule, RouterModule, CommonModule],
 })
-export class MedicinesComponent implements OnInit {
+export class MedicineCategoryComponent implements OnInit {
 
-  displayedColumns: string[] = [
-    'id',
-    'medicineName',
-    'genericName',
-    'categoryName',
-    'unitPrice',
-    'stockQuantity',
-    'reorderLevel',
-    'discount',
-    'status',
-    'actions'
-  ];
+ displayedColumns = ['id', 'categoryName', 'description','isActive', 'actions'];
 
   dataSource = new MatTableDataSource<any>([]);
   isLoading = true;
@@ -41,20 +30,21 @@ export class MedicinesComponent implements OnInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
-    private medicineService: MedicineService,
+    private medicineCategoryService: MedicineCategoryService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
-    this.loadMedicines();
+    this.loadMedicineCategorys();
   }
 
-  loadMedicines() {
+  loadMedicineCategorys() {
     this.isLoading = true;
     
-    this.medicineService.getMedicines().subscribe({
+    this.medicineCategoryService.getMedicineCategorys().subscribe({
       next: (data) => {
+        console.log(data);
         this.dataSource.data = data;
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
@@ -76,7 +66,7 @@ export class MedicinesComponent implements OnInit {
     }
   }
 
-  deleteMedicine(id: number) {
+  deleteMedicineCategory(id: number) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '350px',
       data: {
@@ -87,7 +77,7 @@ export class MedicinesComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.medicineService.deleteMedicine(id).subscribe({
+        this.medicineCategoryService.deleteMedicineCategory(id).subscribe({
           next: () => {
             this.snackBar.open('Deleted successfully!', 'Close', { duration: 3000 });
             this.dataSource.data = this.dataSource.data.filter((m: any) => m.id !== id);

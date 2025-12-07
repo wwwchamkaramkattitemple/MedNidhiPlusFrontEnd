@@ -69,18 +69,18 @@
       <!-- Master Menu -->
 <mat-menu #mastermenu="matMenu" class="cardWithShadow">
 
-   <button mat-menu-item [routerLink]="['/departments']">
-    <mat-icon style="color: grey;" class="d-flex align-items-center">
-   business
-    </mat-icon>
-    <span>Departments</span>
-  </button>
-
   <button mat-menu-item [routerLink]="['/doctors']">
     <mat-icon style="color: grey;" class="d-flex align-items-center">
      person_add
     </mat-icon>
     <span>Doctors</span>
+  </button>
+
+    <button mat-menu-item [routerLink]="['/departments']">
+    <mat-icon style="color: grey;" class="d-flex align-items-center">
+   business
+    </mat-icon>
+    <span>Departments</span>
   </button>
 
   <button mat-menu-item [routerLink]="['/procedures']">
@@ -92,9 +92,16 @@
 
   <button mat-menu-item [routerLink]="['/medicines']">
     <mat-icon style="color: grey;" class="d-flex align-items-center">
-     medical_services
+     local_pharmacy
     </mat-icon>
     <span>Medicines</span>
+  </button>
+
+   <button mat-menu-item [routerLink]="['/medicine-category']">
+    <mat-icon style="color: grey;" class="d-flex align-items-center">
+     category
+    </mat-icon>
+    <span>Medicine Category</span>
   </button>
 
 </mat-menu>

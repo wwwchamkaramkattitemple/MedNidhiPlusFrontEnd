@@ -6,6 +6,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MaterialModule } from "../../../material.module";
 import { CommonModule } from '@angular/common';
 import { ProcedureService } from '../../../../services/procedure.service';
+import { error } from 'node:console';
 
 @Component({
    selector: 'app-procedure-form',
@@ -79,7 +80,7 @@ onSubmit(): void {
   this.isLoading = true;
 
   const procedureData = {
-  id: this.procedureId, 
+  id: this.procedureId ?? 0, 
   procedureName: this.procedureForm.value.procedureName,
   description: this.procedureForm.value.description,
   fee: Number(this.procedureForm.value.fee),
@@ -97,6 +98,7 @@ onSubmit(): void {
       },
       error: (err) => {
         console.error('Error updating procedure:', err);
+        console.log("Validation Error",err.error?.errors);
         this.snackBar.open('Error updating procedure', 'Close', { duration: 3000 });
         this.isLoading = false;
       }
@@ -110,6 +112,7 @@ onSubmit(): void {
       },
       error: (err) => {
         console.error('Error creating procedure:', err);
+        console.log("Validation Error",err.error?.errors);
         this.snackBar.open('Error creating procedure', 'Close', { duration: 3000 });
         this.isLoading = false;
       }

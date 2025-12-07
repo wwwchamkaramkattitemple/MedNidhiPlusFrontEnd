@@ -1,8 +1,8 @@
-.medicine-form-container {
+.medicineCategory-form-container {
   padding: 20px;
 }
 
-.medicine-form-header {
+.medicineCategory-form-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -40,23 +40,15 @@ form {
 .form-row-mode {
   display: flex;
   gap: 16px;
+  align-items: center;
   flex-wrap: wrap;
 
   mat-form-field {
-    flex: 1; /* Default width for all fields */
-    min-width: 150px;
+    flex: 0 0 50%;  /* Half width for input */
+    min-width: 200px;
   }
 
-  /* Make specific ones wider or smaller */
-  mat-form-field:first-child, /* First Name */
-  mat-form-field:nth-child(2) { /* Last Name */
-    flex: 2; /* Twice the width of Gender */
-  }
-
-  mat-form-field:nth-child(3) { /* Gender */
-    flex: 1; /* Smaller width */
-    min-width: 150px;
-  }
+ 
 }
 
 
@@ -75,7 +67,7 @@ form {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .medicine-form-header {
+  .medicineCategory-form-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;

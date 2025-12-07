@@ -9,6 +9,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { InvoiceService } from '../../../../services/invoice.service';
 
 @Component({
   selector: 'app-invoices',
@@ -28,7 +30,7 @@ export class InvoicesComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private dialog: MatDialog) { }
+  constructor(private dialog: MatDialog,private snackBar:MatSnackBar,private invoiceService:InvoiceService) { }
 
   ngOnInit(): void {
     this.loadInvoices();
@@ -40,72 +42,34 @@ export class InvoicesComponent implements OnInit {
   }
 
   loadInvoices() {
-    // Simulate API call with delay
-    this.isLoading = true;
-    setTimeout(() => {
-      // Mock data - replace with actual API call
-      const invoices = [
-        {
-          id: 1,
-          invoiceNumber: 'INV-2023-001',
-          date: new Date('2023-06-10'),
-          dueDate: new Date('2023-06-25'),
-          patientId: 1,
-          patientName: 'John Doe',
-          amount: 150.00,
-          status: 'Paid',
-          paymentDate: new Date('2023-06-15')
-        },
-        {
-          id: 2,
-          invoiceNumber: 'INV-2023-002',
-          date: new Date('2023-06-12'),
-          dueDate: new Date('2023-06-27'),
-          patientId: 2,
-          patientName: 'Jane Smith',
-          amount: 200.00,
-          status: 'Pending',
-          paymentDate: null
-        },
-        {
-          id: 3,
-          invoiceNumber: 'INV-2023-003',
-          date: new Date('2023-06-14'),
-          dueDate: new Date('2023-06-29'),
-          patientId: 3,
-          patientName: 'Robert Brown',
-          amount: 75.50,
-          status: 'Overdue',
-          paymentDate: null
-        },
-        {
-          id: 4,
-          invoiceNumber: 'INV-2023-004',
-          date: new Date('2023-06-15'),
-          dueDate: new Date('2023-06-30'),
-          patientId: 4,
-          patientName: 'Emily Davis',
-          amount: 320.00,
-          status: 'Pending',
-          paymentDate: null
-        },
-        {
-          id: 5,
-          invoiceNumber: 'INV-2023-005',
-          date: new Date(),
-          dueDate: new Date(new Date().setDate(new Date().getDate() + 15)),
-          patientId: 5,
-          patientName: 'Michael Wilson',
-          amount: 450.75,
-          status: 'Pending',
-          paymentDate: null
-        }
-      ];
-      
+  this.isLoading = true;
+
+  this.invoiceService.getInvoices().subscribe({
+    next: (response: any[]) => {
+      // Transform backend invoice into UI-friendly list format
+      const invoices = response.map(inv => ({
+        id: inv.id,
+        invoiceNumber: inv.invoiceNumber,
+        date: new Date(inv.invoiceDate),
+        dueDate: inv.dueDate ? new Date(inv.dueDate) : null,
+        patientId: inv.patientId,
+        patientName: inv.patient?.firstName + ' ' + inv.patient?.lastName,
+        amount: inv.totalAmount,
+        status: inv.status,
+        paymentDate: inv.paymentDate ? new Date(inv.paymentDate) : null
+      }));
+
       this.dataSource.data = invoices;
       this.isLoading = false;
-    }, 1000);
-  }
+    },
+    error: err => {
+      console.error('Failed to load invoices', err);
+      this.isLoading = false;
+      this.snackBar.open('Error loading invoices', 'Close', { duration: 3000 });
+    }
+  });
+}
+
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -179,24 +143,36 @@ export class InvoicesComponent implements OnInit {
   }
 }
 
-  deleteInvoice(id: number) {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '350px',
-      data: { 
-        title: 'Confirm Delete', 
-        message: 'Are you sure you want to delete this invoice? This action cannot be undone.'
-      }
-    });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // Simulate API call
-        console.log(`Deleting invoice with ID: ${id}`);
-        // Remove from data source
-        this.dataSource.data = this.dataSource.data.filter(item => item.id !== id);
-      }
-    });
-  }
+  deleteInvoice(id: number) {
+  const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+    width: '350px',
+    data: { 
+      title: 'Confirm Delete', 
+      message: 'Are you sure you want to delete this invoice? This action cannot be undone.'
+    }
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+
+      this.invoiceService.deleteInvoice(id).subscribe({
+        next: () => {
+          // Remove from table UI
+          this.dataSource.data = this.dataSource.data.filter(item => item.id !== id);
+
+          this.snackBar.open('Invoice deleted successfully!', 'Close', { duration: 3000 });
+        },
+        error: err => {
+          console.error('Delete failed', err);
+          this.snackBar.open('Error deleting invoice', 'Close', { duration: 3000 });
+        }
+      });
+
+    }
+  });
+}
+
 
   recordPayment(id: number) {
     // Navigate to payment form
