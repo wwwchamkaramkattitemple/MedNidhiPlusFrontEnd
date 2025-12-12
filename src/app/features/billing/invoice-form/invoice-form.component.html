@@ -1,4 +1,4 @@
-<div class="invoice-form-container">
+<div class="invoice-form-container" [formGroup]="invoiceForm">
   <div class="invoice-form-header">
     <h1 class="mat-headline-4">{{ isEditMode ? 'Edit' : 'New' }} Invoice</h1>
     <button mat-button color="primary" (click)="cancel()">
@@ -6,9 +6,14 @@
     </button>
   </div>
 
-  <form [formGroup]="invoiceForm" (ngSubmit)="onSubmit()">
+  <div *ngIf="isLoading" class="loading-spinner">
+    <mat-spinner></mat-spinner>
+  </div>
 
-    <!-- Invoice Header -->
+  <form [formGroup]="invoiceForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+    <mat-card>
+      <mat-card-content>
+        <!-- Invoice Header -->
     <mat-card>
       <mat-card-header>
         <mat-card-title>Invoice Information</mat-card-title>
@@ -67,145 +72,131 @@
       </mat-card-content>
     </mat-card>
 
-    <!-- Invoice Items -->
-    <mat-card class="items-card">
-      <mat-card-header>
-        <mat-card-title>Invoice Items</mat-card-title>
-        <button mat-button color="primary" class="ml-5" type="button" (click)="addInvoiceItem()">
-          <mat-icon>add</mat-icon> Add Item
-        </button>
-      </mat-card-header>
+     <!-- Invoice Items -->
+    
+     <mat-card-title>Invoice Items</mat-card-title>
+     <mat-divider></mat-divider>
 
-      <mat-card-content>
-        <div formArrayName="invoiceItems">
-
-          <div *ngFor="let item of invoiceItems.controls; let i = index" [formGroupName]="i" class="invoice-item">
-
-            <div class="item-header">
+        <div formArrayName="invoiceItems" class="mt-4">
+          <div *ngFor="let item of invoiceItems.controls; let i = index" [formGroupName]="i"
+            class="invoice-item card p-3 mb-3">
+            <div class="item-header d-flex justify-between items-center mb-2">
               <strong>Item #{{ i + 1 }}</strong>
-
               <button mat-icon-button color="warn" *ngIf="invoiceItems.length > 1" (click)="removeInvoiceItem(i)">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
 
             <div class="form-row">
-
-              <!-- Type Select -->
-              <mat-form-field appearance="outline">
+              <mat-form-field appearance="outline" class="w-40">
                 <mat-label>Billing Item Type</mat-label>
                 <mat-select formControlName="itemType" (selectionChange)="loadItemOptions(i)">
-                  <mat-option *ngFor="let type of billingItemTypes" [value]="type">
-                    {{ type }}
-                  </mat-option>
+                  <mat-option *ngFor="let t of billingItemTypes" [value]="t">{{ t }}</mat-option>
                 </mat-select>
               </mat-form-field>
 
 
-              <!-- Billing Lookup -->
-             
               <mat-form-field appearance="outline">
                 <mat-label>Select</mat-label>
-                <input type="text" matInput [matAutocomplete]="autoBilling" [formControlName]="'selectedItem'"
-                  (input)="searchBillingItems($event, i)">
 
-                <mat-autocomplete #autoBilling="matAutocomplete" [displayWith]="displayBillingItem"
+                <input type="text" matInput formControlName="selectedItem" [matAutocomplete]="auto"
+                  (input)="searchBillingItems($event, i)" />
+
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayBillingItem"
                   (optionSelected)="onBillingItemSelected($event.option.value, i)">
-                  <mat-option *ngFor="let item of filteredBillingItems" [value]="item">
-                    {{ displayBillingItem(item) }}
+
+                  <mat-option *ngFor="let option of invoiceItems.at(i).get('filteredList')?.value" [value]="option">
+                    {{ displayBillingItem(option) }}
                   </mat-option>
+
                 </mat-autocomplete>
 
               </mat-form-field>
 
-
-
             </div>
 
-            <!-- Description -->
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Description</mat-label>
-              <input matInput formControlName="description" />
+              <input matInput formControlName="description">
             </mat-form-field>
 
             <div class="form-row">
               <mat-form-field appearance="outline">
                 <mat-label>Unit Price</mat-label>
-                <span matPrefix>₹ </span>
-                <input type="number" matInput formControlName="unitPrice" (blur)="onItemValueChange(i)" />
+                <span matPrefix>&nbsp; ₹ &nbsp;</span>
+                <input matInput type="number" formControlName="unitPrice" (blur)="onItemValueChange(i)">
               </mat-form-field>
 
               <mat-form-field appearance="outline">
                 <mat-label>Qty</mat-label>
-                <input type="number" matInput formControlName="quantity" (blur)="onItemValueChange(i)" />
+                <input matInput type="number" formControlName="quantity" (blur)="onItemValueChange(i)">
               </mat-form-field>
 
               <mat-form-field appearance="outline">
                 <mat-label>Discount</mat-label>
-                <span matPrefix>₹ </span>
-                <input type="number" matInput formControlName="discount" (blur)="onItemValueChange(i)" />
+                <span matPrefix>&nbsp; ₹ &nbsp;</span>
+                <input matInput type="number" formControlName="discount" (blur)="onItemValueChange(i)">
               </mat-form-field>
             </div>
 
             <div class="form-row">
               <mat-form-field appearance="outline">
                 <mat-label>Tax %</mat-label>
-                <input type="number" matInput formControlName="taxRate" (blur)="onItemValueChange(i)" />
+                <input matInput type="number" formControlName="taxRate" (blur)="onItemValueChange(i)">
               </mat-form-field>
 
               <mat-form-field appearance="outline">
                 <mat-label>Tax Amount</mat-label>
-                <span matPrefix>₹ </span>
-                <input type="number" matInput formControlName="taxAmount" readonly />
+                <span matPrefix>&nbsp; ₹ &nbsp;</span>
+                <input matInput type="number" formControlName="taxAmount" readonly>
               </mat-form-field>
 
               <mat-form-field appearance="outline">
                 <mat-label>Total Amount</mat-label>
-                <span matPrefix>₹ </span>
-                <input type="number" matInput formControlName="totalAmount" readonly />
+                <span matPrefix>&nbsp; ₹ &nbsp;</span>
+                <input matInput type="number" formControlName="totalAmount" readonly>
               </mat-form-field>
             </div>
-
           </div>
-
         </div>
-      </mat-card-content>
-    </mat-card>
 
-    <!-- Totals -->
-    <mat-card>
-      <mat-card-header><mat-card-title>Invoice Totals</mat-card-title></mat-card-header>
-      <mat-card-content>
-        <hr>
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Subtotal</mat-label>
-            <span matPrefix>₹ </span>
-            <input matInput formControlName="subTotal" readonly />
+        <div class="text-right mb-3">
+          <button mat-stroked-button color="primary" (click)="addInvoiceItem()">+ Add Item</button>
+        </div>
+
+         <mat-card-header><mat-card-title>Invoice Totals</mat-card-title></mat-card-header>
+
+        <mat-divider></mat-divider>
+
+        <div class="form-row mt-3">
+          <mat-form-field appearance="outline" class="w-33">
+            <mat-label>Sub Total</mat-label>
+            <span matPrefix>&nbsp; ₹ &nbsp;</span>
+            <input matInput formControlName="subTotal" readonly>
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" class="w-33">
             <mat-label>Tax Amount</mat-label>
-            <span matPrefix>₹ </span>
-            <input matInput formControlName="taxAmount" readonly />
+            <span matPrefix>&nbsp; ₹ &nbsp;</span>
+            <input matInput formControlName="taxAmount" readonly>
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" class="w-33">
             <mat-label>Total Amount</mat-label>
-            <span matPrefix>₹ </span>
-            <input matInput formControlName="totalAmount" readonly />
+            <span matPrefix>&nbsp; ₹ &nbsp;</span>
+            <input matInput formControlName="totalAmount" readonly>
           </mat-form-field>
         </div>
 
-      </mat-card-content>
+     
 
-      <mat-card-actions align="end">
+        <mat-card-actions align="end">
         <button mat-button type="button" class="mr-5" (click)="cancel()">Cancel</button>
         <button mat-raised-button color="primary" type="submit">
           {{ isEditMode ? 'Update' : 'Create' }} Invoice
         </button>
       </mat-card-actions>
+      </mat-card-content>
     </mat-card>
-
   </form>
 </div>

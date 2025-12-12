@@ -16,14 +16,14 @@ export class PatientService {
   private apiUrl = `${environment.apiUrl}`;
   token = '';
 
-  constructor(private http: HttpClient,private authService:AuthenticationService) { }
+  constructor(private http: HttpClient, private authService: AuthenticationService) { }
 
   getAllPatients(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/patient`, { headers: this.getAuthHeaders() });
   }
 
-  getPatientById(patientId: number) {
-    return this.http.get<any[]>(this.apiUrl + `/patient/${patientId}`, { headers: this.getAuthHeaders() });
+  getPatientById(patientId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/patient/${patientId}`, { headers: this.getAuthHeaders() });
   }
 
   searchPatients(query: string): Observable<any[]> {
@@ -42,6 +42,10 @@ export class PatientService {
     return this.http.delete(`${this.apiUrl}/patient/${patientId}`, { headers: this.getAuthHeaders() });
   }
 
+  getAppointmentsByPatientId(patientId: number) {
+    return this.http.get<any[]>(`${this.apiUrl}/appointment/patient/${patientId}`, { headers: this.getAuthHeaders() });
+  }
+
   getAuthHeaders(): HttpHeaders {
     const userData = localStorage.getItem('userData');
     if (userData) {
@@ -52,7 +56,7 @@ export class PatientService {
         this.token = '';
       }
     }
-     if (this.authService.isTokenExpired(this.token)) {
+    if (this.authService.isTokenExpired(this.token)) {
       this.authService.onLogOut();
     }
     return new HttpHeaders({ 'Authorization': `Bearer ${this.token}` });

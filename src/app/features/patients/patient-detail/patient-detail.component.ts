@@ -8,13 +8,15 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
 import { MaterialModule } from "../../../material.module";
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { PatientService } from '../../../../services/patient.service';
+import { InvoiceService } from '../../../../services/invoice.service';
 
 @Component({
   selector: 'app-patient-detail',
-  standalone:true,
+  standalone: true,
   templateUrl: './patient-detail.component.html',
   styleUrls: ['./patient-detail.component.scss'],
-  imports: [MaterialModule,CommonModule,RouterModule]
+  imports: [MaterialModule, CommonModule, RouterModule]
 })
 export class PatientDetailComponent implements OnInit {
   patient: any = null;
@@ -28,7 +30,9 @@ export class PatientDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private patientService: PatientService,
+    private invoiceService: InvoiceService
   ) { }
 
   ngOnInit(): void {
@@ -43,99 +47,72 @@ export class PatientDetailComponent implements OnInit {
     });
   }
 
+ 
+
   loadPatientData(id: number): void {
-    this.isLoading = true;
+  this.isLoading = true;
 
-    // In a real application, this would be an API call to the backend
-    // For now, we'll simulate the data
-
-    // Simulate API call delay
-    setTimeout(() => {
-      this.patient = {
-        id: id,
-        firstName: 'John',
-        lastName: 'Doe',
-        phoneNumber: '555-123-4567',
-        email: 'john.doe@example.com',
-        dateOfBirth: new Date(1980, 5, 15),
-        address: '123 Main St',
-        city: 'Anytown',
-        state: 'CA',
-        zipCode: '12345',
-        medicalHistory: 'No significant medical history',
-        insuranceProvider: 'Health Insurance Co',
-        insurancePolicyNumber: 'HI12345678',
-        createdAt: new Date(2023, 0, 15)
-      };
-
-      this.appointments = [
-        { id: 1, date: new Date(), time: '09:00', status: 'Scheduled', type: 'Check-up', doctorName: 'Dr. Smith' },
-        { id: 2, date: new Date(2023, 4, 10), time: '14:30', status: 'Completed', type: 'Consultation', doctorName: 'Dr. Johnson' },
-        { id: 3, date: new Date(2023, 3, 5), time: '11:15', status: 'Cancelled', type: 'Follow-up', doctorName: 'Dr. Smith' }
-      ];
-
-      this.invoices = [
-        { id: 1, invoiceNumber: 'INV-20230515-0001', date: new Date(2023, 4, 15), amount: 125.00, status: 'Paid' },
-        { id: 2, invoiceNumber: 'INV-20230410-0003', date: new Date(2023, 3, 10), amount: 350.75, status: 'Paid' },
-        { id: 3, invoiceNumber: 'INV-20230305-0002', date: new Date(2023, 2, 5), amount: 210.50, status: 'Pending' }
-      ];
-
+  this.patientService.getPatientById(id).subscribe({
+    next: (patientRes) => {
+      this.patient = patientRes;
+      this.loadPatientAppointments(id);
+      this.loadPatientInvoices(id);
+    },
+    error: (err) => {
+      console.error("Error fetching patient:", err);
+      this.snackBar.open("Error loading patient data", "Close", { duration: 3000 });
       this.isLoading = false;
-    }, 1000);
+      this.router.navigate(['/patients']);
+    }
+  });
+}
 
-    // In a real application, we would make HTTP requests to the backend API
-    // Example:
-    /*
-    this.http.get<any>(`${environment.apiUrl}/patients/${id}`).subscribe(
-      (data) => {
-        this.patient = data;
-        this.loadPatientAppointments(id);
-      },
-      (error) => {
-        console.error('Error fetching patient:', error);
-        this.snackBar.open('Error loading patient data', 'Close', { duration: 3000 });
-        this.isLoading = false;
-        this.router.navigate(['/patients']);
-      }
-    );
-    */
-  }
 
   loadPatientAppointments(patientId: number): void {
-    // In a real application, we would make HTTP requests to the backend API
-    // Example:
-    /*
-    this.http.get<any[]>(`${environment.apiUrl}/appointments/patient/${patientId}`).subscribe(
-      (data) => {
-        this.appointments = data;
-        this.loadPatientInvoices(patientId);
-      },
-      (error) => {
-        console.error('Error fetching appointments:', error);
-        this.appointments = [];
-        this.loadPatientInvoices(patientId);
-      }
-    );
-    */
-  }
+  this.patientService.getAppointmentsByPatientId(patientId).subscribe({
+    next: (appointmentsRes) => {
+      this.appointments = appointmentsRes.map(a => ({
+        id: a.id,
+        date: new Date(a.appointmentDate),
+        time: a.appointmentTime,
+        status: a.statusName,
+        type: a.appointmentType,
+        doctorName: a.doctorName,
+        fee: a.fee,
+        isBilled: a.isBilled
+      }));
+    },
+    error: (err) => {
+      console.error("Failed to load appointments:", err);
+      this.appointments = [];
+    }
+  });
+}
 
-  loadPatientInvoices(patientId: number): void {
-    // In a real application, we would make HTTP requests to the backend API
-    // Example:
-    /*
-    this.http.get<any[]>(`${environment.apiUrl}/invoices/patient/${patientId}`).subscribe(
-      (data) => {
-        this.invoices = data;
-        this.isLoading = false;
-      },
-      (error) => {
-        console.error('Error fetching invoices:', error);
-        this.invoices = [];
-        this.isLoading = false;
-      }
-    );
-    */
-  }
+
+
+ loadPatientInvoices(patientId: number): void {
+  this.invoiceService.getPatientInvoicesByPatientId(patientId).subscribe({
+    next: (res: any[]) => {
+      this.invoices = res.map(inv => ({
+        id: inv.id,
+        invoiceNumber: inv.invoiceNumber,
+        date: new Date(inv.invoiceDate),  
+        amount: inv.amount,
+        status: inv.status
+      }));
+
+      this.isLoading = false;
+    },
+    error: (err) => {
+      console.error("Failed to load invoices", err);
+      this.invoices = [];
+      this.isLoading = false;
+    }
+  });
+}
+
+
 
   getFullName(): string {
     return `${this.patient.firstName} ${this.patient.lastName}`;
@@ -171,41 +148,38 @@ export class PatientDetailComponent implements OnInit {
     }
   }
 
-  deletePatient(): void {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '350px',
-      data: { 
-        title: 'Confirm Delete', 
-        message: 'Are you sure you want to delete this patient? This action cannot be undone.'
-      }
-    });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // In a real application, this would be an API call to the backend
-        // For now, we'll simulate the deletion
+   deletePatient(id: number) {
+  const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+    width: '350px',
+    data: {
+      title: 'Confirm Delete',
+      message: 'Are you sure you want to delete this patient? This action cannot be undone.'
+    }
+  });
 
-        // Simulate API call delay
-        setTimeout(() => {
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      this.patientService.deletePatient(id).subscribe({
+        next: () => {
           this.snackBar.open('Patient deleted successfully', 'Close', { duration: 3000 });
           this.router.navigate(['/patients']);
-        }, 1000);
+        },
+        error: (err) => {
+          console.error('Error deleting patient:', err);
 
-        // In a real application, we would make an HTTP request to the backend API
-        // Example:
-        /*
-        this.http.delete(`${environment.apiUrl}/patients/${this.patientId}`).subscribe(
-          () => {
-            this.snackBar.open('Patient deleted successfully', 'Close', { duration: 3000 });
-            this.router.navigate(['/patients']);
-          },
-          (error) => {
-            console.error('Error deleting patient:', error);
-            this.snackBar.open('Error deleting patient', 'Close', { duration: 3000 });
+          if (err.status === 403) {
+            this.snackBar.open('You do not have permission to delete this patient.', 'Close', { duration: 5000 });
+          } else if (err.status === 404) {
+            this.snackBar.open('Patient not found.', 'Close', { duration: 3000 });
+          } else {
+            this.snackBar.open('Error deleting patient.', 'Close', { duration: 3000 });
           }
-        );
-        */
-      }
-    });
-  }
+        }
+      });
+    }
+  });
+}
+
+ 
 }

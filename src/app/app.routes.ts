@@ -25,6 +25,7 @@ import { ProceduresComponent } from './features/procedures/procedures.component'
 import { ProcedureFormComponent } from './features/procedures/procedure-form/procedure-form.component';
 import { MedicineCategoryComponent } from './features/medicine-category/medicine-category.component';
 import { MedicineCategoryFormComponent } from './features/medicine-category/medicine-category-form/medicine-category-form.component';
+import { PaymentFormComponent } from './features/billing/payment-form/payment-form.component';
 // import { ProcessfilesComponent } from './features/processfiles/processfiles.component';
 
 export const appRoutes: Routes = [
@@ -76,6 +77,9 @@ export const appRoutes: Routes = [
   { path: 'billing/new', component: InvoiceFormComponent },
   { path: 'billing/:id', component: InvoiceDetailComponent },
   { path: 'billing/:id/edit', component: InvoiceFormComponent },
+  { path: 'billing/:id/payment', component: PaymentFormComponent },
+  { path: 'billing/detail/:id', component: InvoiceDetailComponent },
+
 
   // Department routes
   { path: 'departments', component: DepartmentsComponent },
@@ -98,10 +102,11 @@ export const appRoutes: Routes = [
   { path: 'medicine-category/:id/edit', component: MedicineCategoryFormComponent },
 
 
-   // Procedure routes
+  // Procedure routes
   { path: 'procedures', component: ProceduresComponent },
   { path: 'procedures/new', component: ProcedureFormComponent },
   { path: 'procedures/:id/edit', component: ProcedureFormComponent },
+
 
 
 

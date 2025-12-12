@@ -22,7 +22,7 @@ export class InvoiceService {
         return this.http.get<any[]>(`${this.apiUrl}/invoice`, { headers: this.getAuthHeaders() });
     }
 
-    getInvoiceById(id: number) {
+    getInvoiceById(id: number): Observable<any> {
         return this.http.get<any>(`${this.apiUrl}/invoice/${id}`, { headers: this.getAuthHeaders() });
     }
 
@@ -35,8 +35,13 @@ export class InvoiceService {
     }
 
     deleteInvoice(id: number): Observable<void> {
-        return this.http.delete<void>(`${this.apiUrl}/invoice/${id}`, {headers: this.getAuthHeaders(),});
+        return this.http.delete<void>(`${this.apiUrl}/invoice/${id}`, { headers: this.getAuthHeaders(), });
     }
+
+    getPatientInvoicesByPatientId(patientId: number) {
+        return this.http.get<any[]>(`${this.apiUrl}/invoice/patient/${patientId}`, { headers: this.getAuthHeaders() });
+    }
+
 
     getAuthHeaders(): HttpHeaders {
         const userData = localStorage.getItem('userData');

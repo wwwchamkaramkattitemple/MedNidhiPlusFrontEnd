@@ -6,16 +6,35 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatCard } from "@angular/material/card";
 import { MaterialModule } from "../../../material.module";
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, DateAdapter } from '@angular/material/core';
+import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
+import * as _moment from 'moment';
+import 'moment/locale/en-gb';
+
+export const MY_DATE_FORMATS = {
+  parse: { dateInput: 'DD/MM/YYYY' },
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'DD/MM/YYYY',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 
 @Component({
   selector: 'app-payment-form',
-  standalone:true,
+  standalone: true,
   templateUrl: './payment-form.component.html',
   styleUrls: ['./payment-form.component.scss'],
-  imports: [MatProgressSpinnerModule, MatCard, MaterialModule, ReactiveFormsModule,CommonModule]
+  imports: [MatProgressSpinnerModule, MatCard, MaterialModule, ReactiveFormsModule, CommonModule],
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
+    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS] },
+    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
+  ],
 })
 export class PaymentFormComponent implements OnInit {
-  invoiceId?: string|null;
+  invoiceId?: string | null;
   invoice: any;
   paymentForm!: FormGroup;
   isLoading = true;

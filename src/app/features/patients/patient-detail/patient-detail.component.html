@@ -8,7 +8,7 @@
       <button mat-raised-button color="primary mr-5" [routerLink]="['/patients', patientId, 'edit']">
         <mat-icon>edit</mat-icon> Edit
       </button>
-      <button mat-raised-button color="warn" (click)="deletePatient()">
+      <button mat-raised-button color="warn" (click)="deletePatient(patientId)">
         <mat-icon>delete</mat-icon> Delete
       </button>
     </div>
@@ -20,27 +20,41 @@
 
   <div *ngIf="!isLoading && patient" class="patient-content">
     <mat-card class="patient-info-card">
-      <mat-card-header>
-        <mat-card-title>{{ getFullName() }}</mat-card-title>
+      <!-- <mat-card-header >
+        <mat-card-title style="color: #3f51b5; font-weight:800;" >{{ getFullName() }}</mat-card-title>
         <mat-card-subtitle>{{ patient.email }}</mat-card-subtitle>
+      </mat-card-header> -->
+      <mat-card-header>
+        <div class="header-flex">
+          <div class="left-block">
+            <mat-card-title class="primary-title">{{ getFullName() }}</mat-card-title>
+            <mat-card-subtitle>{{ patient.email }}</mat-card-subtitle>
+          </div>
+
+          <div class="right-block">
+            <div class="info-label">Phone</div>
+            <div class="info-value primary-title">{{ patient.phoneNumber }}</div>
+          </div>
+        </div>
       </mat-card-header>
+
+      <mat-divider></mat-divider>
       <mat-card-content>
         <div class="info-grid">
-          <div class="info-item">
-            <div class="info-label">Phone</div>
-            <div class="info-value">{{ patient.phoneNumber }}</div>
-          </div>
+         
           <div class="info-item">
             <div class="info-label">Date of Birth</div>
             <div class="info-value">{{ patient.dateOfBirth | date:'MMM d, y' }} ({{ getAge() }} years)</div>
           </div>
           <div class="info-item">
             <div class="info-label">Address</div>
-            <div class="info-value">{{ patient.address }}, {{ patient.city }}, {{ patient.state }} {{ patient.zipCode }}</div>
+            <div class="info-value">{{ patient.address }}, {{ patient.city }}, {{ patient.state }} {{ patient.zipCode }}
+            </div>
           </div>
           <div class="info-item">
             <div class="info-label">Insurance</div>
-            <div class="info-value">{{ patient.insuranceProvider }} (Policy #: {{ patient.insurancePolicyNumber }})</div>
+            <div class="info-value">{{ patient.insuranceProvider }} (Policy #: {{ patient.insurancePolicyNumber }})
+            </div>
           </div>
           <div class="info-item">
             <div class="info-label">Patient Since</div>
@@ -50,7 +64,7 @@
             <div class="info-label">Medical History</div>
             <div class="info-value">{{ patient.medicalHistory || 'No medical history recorded' }}</div>
           </div>
-          
+
         </div>
       </mat-card-content>
     </mat-card>
@@ -68,8 +82,8 @@
           <!-- Date Column -->
           <ng-container matColumnDef="date">
             <th mat-header-cell *matHeaderCellDef> Date & Time </th>
-            <td mat-cell *matCellDef="let appointment"> 
-              {{ appointment.date | date:'MMM d, y' }} at {{ appointment.time }} 
+            <td mat-cell *matCellDef="let appointment">
+              {{ appointment.date | date:'MMM d, y' }} at {{ appointment.time }}
             </td>
           </ng-container>
 
@@ -88,7 +102,7 @@
           <!-- Status Column -->
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef> Status </th>
-            <td mat-cell *matCellDef="let appointment"> 
+            <td mat-cell *matCellDef="let appointment">
               <mat-chip [color]="getStatusColor(appointment.status)" selected>
                 {{ appointment.status }}
               </mat-chip>
@@ -144,13 +158,13 @@
           <!-- Amount Column -->
           <ng-container matColumnDef="amount">
             <th mat-header-cell *matHeaderCellDef> Amount </th>
-            <td mat-cell *matCellDef="let invoice"> &nbsp;&#8377;&nbsp;{{ invoice.amount  }} </td>
+            <td mat-cell *matCellDef="let invoice"> &nbsp;&#8377;&nbsp;{{ invoice.amount }} </td>
           </ng-container>
 
           <!-- Status Column -->
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef> Status </th>
-            <td mat-cell *matCellDef="let invoice"> 
+            <td mat-cell *matCellDef="let invoice">
               <mat-chip [color]="getStatusColor(invoice.status)" selected>
                 {{ invoice.status }}
               </mat-chip>

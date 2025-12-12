@@ -158,3 +158,32 @@ table {
   .mat-column-status {
     width: 120px;
   }
+
+//name and phone number
+  .header-flex {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.left-block mat-card-title {
+  margin-bottom: 4px;
+}
+
+.right-block {
+  text-align: right;
+  font-size: 14px;
+}
+
+.right-block .info-label {
+  font-weight: 600;
+  color: gray;
+}
+
+.primary-title {
+  color: #3f51b5;
+  font-weight: 700;
+}
+
+  

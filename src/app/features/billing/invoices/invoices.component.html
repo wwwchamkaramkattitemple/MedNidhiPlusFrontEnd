@@ -78,7 +78,7 @@
         <!-- Amount Column -->
         <ng-container matColumnDef="amount">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount </th>
-          <td mat-cell *matCellDef="let invoice"> &nbsp;&#8377;&nbsp; {{ invoice.amount  }}  </td>
+          <td mat-cell *matCellDef="let invoice"> &nbsp;&#8377;&nbsp; {{ invoice.amount }} </td>
         </ng-container>
 
         <!-- Status Column -->
@@ -88,11 +88,11 @@
             <!-- <mat-chip [color]="getStatusColor(invoice.status)" selected>
               {{ invoice.status }}
             </mat-chip> -->
-             <mat-chip #chip>
-                <span class="mat-chip-content" [style.color]="getStatusColor(invoice.status)">
-                  {{ invoice.status }}
-                </span>
-              </mat-chip>
+            <mat-chip #chip>
+              <span class="mat-chip-content" [style.color]="getStatusColor(invoice.status)">
+                {{ invoice.status }}
+              </span>
+            </mat-chip>
           </td>
         </ng-container>
 
@@ -106,10 +106,16 @@
             <button mat-icon-button color="primary" [routerLink]="['/billing', invoice.id, 'edit']" matTooltip="Edit">
               <mat-icon>edit</mat-icon>
             </button>
-            <button mat-icon-button style="color: grey;" *ngIf="invoice.status === 'Pending' || invoice.status === 'Overdue'"
+            <!-- <button mat-icon-button style="color: grey;" *ngIf="invoice.status === 'Pending' || invoice.status === 'Overdue'"
+              [routerLink]="['/billing', invoice.id, 'payment']" matTooltip="Record Payment">
+              <mat-icon>payments</mat-icon>
+            </button> -->
+            <button mat-icon-button style="color: grey;"
+              *ngIf="invoice.status === 'Pending' || invoice.status === 'Overdue'"
               [routerLink]="['/billing', invoice.id, 'payment']" matTooltip="Record Payment">
               <mat-icon>payments</mat-icon>
             </button>
+
             <button mat-icon-button color="warn" (click)="deleteInvoice(invoice.id)" matTooltip="Delete">
               <mat-icon>delete</mat-icon>
             </button>

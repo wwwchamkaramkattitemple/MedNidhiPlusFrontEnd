@@ -1,18 +1,33 @@
-.payment-form-container {
+// .payment-form-container {
+//   padding: 20px;
+//   max-width: 1000px;
+//   margin: 0 auto;
+
+//   .payment-form-header {
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+//     margin-bottom: 20px;
+
+//     h1 {
+//       margin: 0;
+//     }
+//   }
+
+  .payment-form-container {
   padding: 20px;
-  max-width: 1000px;
-  margin: 0 auto;
+}
 
-  .payment-form-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+.payment-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 
-    h1 {
-      margin: 0;
-    }
+  h1 {
+    margin: 0;
   }
+}
 
   .loading-spinner {
     display: flex;
@@ -70,7 +85,7 @@
       }
     }
   }
-}
+
 
 /* Responsive adjustments */
 @media (max-width: 768px) {

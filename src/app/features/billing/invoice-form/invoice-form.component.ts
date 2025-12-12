@@ -5,22 +5,19 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MaterialModule } from "../../../material.module";
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { PatientService } from '../../../../services/patient.service';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { PatientService } from '../../../../services/patient.service';
+import { MedicineService } from '../../../../services/medicine.service';
+import { ProcedureService } from '../../../../services/procedure.service';
+import { InvoiceService } from '../../../../services/invoice.service';
+import { AppointmentService } from '../../../../services/appointment.service';
 import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, DateAdapter } from '@angular/material/core';
 import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 import * as _moment from 'moment';
 import 'moment/locale/en-gb';
-import { MedicineService } from '../../../../services/medicine.service';
-import { ProcedureService } from '../../../../services/procedure.service';
-import { InvoiceService } from '../../../../services/invoice.service';
-
-
 
 export const MY_DATE_FORMATS = {
-  parse: {
-    dateInput: 'DD/MM/YYYY',
-  },
+  parse: { dateInput: 'DD/MM/YYYY' },
   display: {
     dateInput: 'DD/MM/YYYY',
     monthYearLabel: 'MMM YYYY',
@@ -37,11 +34,7 @@ export const MY_DATE_FORMATS = {
   imports: [MaterialModule, CommonModule, FormsModule, ReactiveFormsModule, MatAutocompleteModule],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
-    {
-      provide: DateAdapter,
-      useClass: MomentDateAdapter,
-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
-    },
+    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS] },
     { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
   ],
 })
@@ -50,34 +43,25 @@ export class InvoiceFormComponent implements OnInit {
   isEditMode = false;
   invoiceId: number | null = null;
   isLoading = false;
+
   patients: any[] = [];
   filteredPatients: any[] = [];
   appointments: any[] = [];
-  billingItemTypes = ['Medicine', 'Procedure'];
-  filteredBillingItems: any[] = [];
+
+  // C2 labels
+  billingItemTypes = [
+    'Medicine',
+    'Procedure',
+    'Consultation (Appointment)',
+    'Manual Entry'
+  ];
+
+  // lists loaded from backend
   medicineList: any[] = [];
   procedureList: any[] = [];
 
-  invoiceStatuses = [
-    'Pending',
-    'Paid',
-    'Overdue',
-    'Cancelled'
-  ];
-  paymentMethods = [
-    'Cash',
-    'Credit Card',
-    'Debit Card',
-    'Check',
-    'Insurance',
-    'Bank Transfer',
-    'Other'
-  ];
-
-
-  serviceList = [
-    { id: 1, name: "Consultation", price: 200, tax: 0 },
-  ];
+  invoiceStatuses = ['Pending', 'Paid', 'Overdue', 'Cancelled'];
+  paymentMethods = ['Cash', 'Credit Card', 'Debit Card', 'Check', 'Insurance', 'Bank Transfer', 'Other'];
 
   constructor(
     private fb: FormBuilder,
@@ -87,7 +71,8 @@ export class InvoiceFormComponent implements OnInit {
     private patientService: PatientService,
     private medicineService: MedicineService,
     private procedureService: ProcedureService,
-    private invoiceService: InvoiceService
+    private invoiceService: InvoiceService,
+    private appointmentService : AppointmentService
   ) { }
 
   ngOnInit(): void {
@@ -96,7 +81,6 @@ export class InvoiceFormComponent implements OnInit {
     this.loadMedicines();
     this.loadProcedures();
 
-    // Check if we're in edit mode
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
@@ -104,28 +88,20 @@ export class InvoiceFormComponent implements OnInit {
         this.invoiceId = +id;
         this.loadInvoiceData(+id);
       } else {
-        // Check if patientId is provided in query params (for creating from patient detail)
         this.route.queryParamMap.subscribe(queryParams => {
           const patientId = queryParams.get('patientId');
           const appointmentId = queryParams.get('appointmentId');
-
           if (patientId) {
             this.invoiceForm.patchValue({ patientId: +patientId });
             this.onPatientChange(+patientId);
           }
-
           if (appointmentId) {
-            // Load appointment details and add as invoice item
             this.loadAppointmentDetails(+appointmentId);
           }
         });
       }
     });
   }
-
-
-
-
 
   initializeForm(): void {
     this.invoiceForm = this.fb.group({
@@ -135,7 +111,6 @@ export class InvoiceFormComponent implements OnInit {
       status: ['Pending', Validators.required],
       notes: [''],
       subTotal: [0, [Validators.required, Validators.min(0)]],
-      taxRate: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
       taxAmount: [0, [Validators.required, Validators.min(0)]],
       totalAmount: [0, [Validators.required, Validators.min(0)]],
       paidAmount: [0, [Validators.required, Validators.min(0)]],
@@ -144,177 +119,41 @@ export class InvoiceFormComponent implements OnInit {
       invoiceItems: this.fb.array([])
     });
 
-    // Add at least one empty item
+    // Ensure at least one row
     this.addInvoiceItem();
   }
 
-
-
-
-  loadItemOptions(index: number) {
-    const itemForm = this.invoiceItems.at(index);
-
-    const type = itemForm.get('itemType')?.value;
-
-    if (type === 'Medicine') this.filteredBillingItems = [...this.medicineList];
-    else if (type === 'Procedure') this.filteredBillingItems = [...this.procedureList];
-
-    // Reset all dependent values
-    itemForm.patchValue({
-      selectedItem: null,
-      description: '',
-      unitPrice: 0,
-      taxRate: 0,
-      taxAmount: 0,
-      totalAmount: 0
-    });
-
-    this.calculateTotals();
-  }
-
-
-  // displayBillingItem(item: any): string {
-  //   return item ? `${item.medicineName || item.procedureName} (₹${item.unitPrice || item.fee})` : '';
-  // }
-
-  // displayBillingItem(item: any): string {
-  //   if (!item) return '';
-
-  //   const name =
-  //     item.name ||
-  //     item.procedureName ||
-  //     item.medicineName ||
-  //     item.description ||
-  //     'Unknown';
-
-  //   const price =
-  //     item.price ||
-  //     item.unitPrice ||
-  //     item.fee ||
-  //     0;
-
-  //   return `${name} (₹${price})`;
-  // }
-
-
-  displayBillingItem(item: any): string {
-  if (!item) return "";
-
-  const name =
-    item.medicineName ||
-    item.procedureName ||
-    item.name ||
-    item.description ||
-    "Item";
-
-  const price = item.unitPrice ?? item.fee ?? item.price ?? 0;
-
-  return `${name} (₹${price})`;
-}
-
-
-
-  //   displayBillingItem(item: any): string {
-  //   return item ? `${item.name} (₹${item.price ?? item.fee ?? 0})` : '';
-  // }
-
-
-  // searchBillingItems(event: any, index: number) {
-  //   const input = event.target.value.toLowerCase();
-  //   const type = this.invoiceItems.at(index).get('itemType')?.value;
-
-  //   let list = type === 'Medicine'
-  //     ? this.medicineList
-  //     : type === 'Procedure'
-  //       ? this.procedureList
-  //       : this.serviceList;
-
-  //   this.filteredBillingItems = list.filter(x =>
-  //     x.name.toLowerCase().includes(input)
-  //   );
-  // }
-
-  searchBillingItems(event: any, index: number) {
-    const input = event.target.value.toLowerCase();
-    const type = this.invoiceItems.at(index).get('itemType')?.value;
-
-    let list = [];
-
-    if (type === 'Medicine') {
-      list = this.medicineList;
-      this.filteredBillingItems = list.filter(x =>
-        x.medicineName.toLowerCase().includes(input)
-      );
-    }
-    else if (type === 'Procedure') {
-      list = this.procedureList;
-      this.filteredBillingItems = list.filter(x =>
-        x.procedureName.toLowerCase().includes(input)
-      );
-    }
-  }
-
-
-
-
-  onBillingItemSelected(selectedItem: any, index: number) {
-    const item = this.invoiceItems.at(index);
-
-    const price = selectedItem.unitPrice || selectedItem.fee;
-    const tax = selectedItem.taxRate;
-
-    item.patchValue({
-      description: selectedItem.medicineName || selectedItem.procedureName,
-      unitPrice: price,
-      quantity: 1,
-      taxRate: tax,
-      taxAmount: (price * tax) / 100,
-      totalAmount: price + ((price * tax) / 100)
-    });
-
-    this.calculateTotals();
-  }
-
-
+  // API loaders
   loadMedicines(): void {
     this.medicineService.getMedicines().subscribe(res => {
-      this.medicineList = res;
-    });
+      this.medicineList = res || [];
+    }, err => console.error('Failed to load medicines', err));
   }
 
   loadProcedures(): void {
     this.procedureService.getAll().subscribe(res => {
-      this.procedureList = res;
-    });
+      this.procedureList = res || [];
+    }, err => console.error('Failed to load procedures', err));
   }
-
-
 
   loadPatients(): void {
     this.isLoading = true;
-    setTimeout(() => {
-      this.patientService.getAllPatients().subscribe({
-        next: (patients) => {
-          this.patients = patients;
-          this.filteredPatients = patients;
-        },
-        error: (err) => console.error('Failed to load patients', err)
-      });
-
-      this.isLoading = false;
-    }, 500);
+    this.patientService.getAllPatients().subscribe({
+      next: patients => {
+        this.patients = patients || [];
+        this.filteredPatients = this.patients;
+        this.isLoading = false;
+      },
+      error: err => { console.error('Failed to load patients', err); this.isLoading = false; }
+    });
   }
 
   onPatientSearch(event: Event): void {
-    const input = (event.target as HTMLInputElement).value?.toLowerCase() || '';
-    this.filteredPatients = this.patients.filter(patient =>
-      `${patient.firstName} ${patient.lastName} ${patient.phoneNumber}`.toLowerCase().includes(input)
+    const q = (event.target as HTMLInputElement).value?.toLowerCase() || '';
+    this.filteredPatients = this.patients.filter(p =>
+      `${p.firstName} ${p.lastName} ${p.phoneNumber}`.toLowerCase().includes(q)
     );
-
-    // Optional: clear stale selection if no matches
-    if (this.filteredPatients.length === 0) {
-      this.invoiceForm.patchValue({ patientId: null });
-    }
+    if (this.filteredPatients.length === 0) this.invoiceForm.patchValue({ patientId: null });
   }
 
   onPatientSelected(patientId: number): void {
@@ -322,228 +161,118 @@ export class InvoiceFormComponent implements OnInit {
   }
 
   getPatientNameById(id: number): string {
-    const patient = this.patients.find(p => p.id === id);
-    return patient ? `${patient.firstName} ${patient.lastName}` : '';
+    const p = this.patients.find(x => x.id === id);
+    return p ? `${p.firstName} ${p.lastName}` : '';
   }
 
   onPatientChange(patientId: number): void {
-    // Load patient's appointments
     this.loadPatientAppointments(patientId);
   }
 
   loadPatientAppointments(patientId: number): void {
-    // Simulate API call
-    this.isLoading = true;
-    setTimeout(() => {
-      // Mock data - replace with actual API call
-      this.appointments = [
-        {
-          id: 1,
-          patientId: patientId,
-          date: new Date('2023-06-15'),
-          time: '09:00 AM',
-          type: 'Check-up',
-          doctor: 'Dr. Smith',
-          fee: 150,
-          isBilled: false
-        },
-        {
-          id: 2,
-          patientId: patientId,
-          date: new Date('2023-06-20'),
-          time: '10:30 AM',
-          type: 'Consultation',
-          doctor: 'Dr. Johnson',
-          fee: 200,
-          isBilled: false
-        }
-      ];
-      this.isLoading = false;
-    }, 500);
-  }
+  this.patientService.getAppointmentsByPatientId(patientId).subscribe({
+    next: (res) => {
+      this.appointments = res || [];
+    },
+    error: (err) => {
+      console.error("Failed to load appointments", err);
+      this.appointments = [];
+    }
+  });
+}
+
+
 
   loadAppointmentDetails(appointmentId: number): void {
-    // Simulate API call
-    this.isLoading = true;
-    setTimeout(() => {
-      // Mock data - replace with actual API call
-      const appointment = {
-        id: appointmentId,
-        patientId: 2,
-        date: new Date('2023-06-20'),
-        time: '10:30 AM',
-        type: 'Consultation',
-        doctor: 'Dr. Johnson',
-        fee: 200,
-        isBilled: false
+  this.isLoading = true;
+
+  this.appointmentService.getAppointmentById(appointmentId).subscribe({
+    next: (appointment: any) => {
+
+      const description = `${appointment.appointmentTypeName || 'Consultation'} with ${appointment.doctorName} on ${new Date(appointment.appointmentDate).toLocaleDateString()}`;
+      const fee = appointment.fee ?? 0;
+      const tax = appointment.defaultTaxRate ?? 0;
+
+      const itemData = {
+        itemType: 'Consultation (Appointment)',
+        selectedItem: {
+          id: appointment.id,
+          name: appointment.appointmentTypeName || 'Consultation',
+          fee: fee,
+          tax: tax
+        },
+        description: description,
+        unitPrice: fee,
+        quantity: 1,
+        discount: 0,
+        taxRate: tax,
+        taxAmount: (fee * tax) / 100,
+        totalAmount: fee + (fee * tax) / 100,
+        appointmentId: appointment.id
       };
 
-      // Add appointment as invoice item
-      const items = this.invoiceForm.get('invoiceItems') as FormArray;
-      if (items.length === 1 && !items.at(0).get('description')?.value) {
-        // Replace the empty item
-        items.at(0).patchValue({
-          description: `${appointment.type} with ${appointment.doctor} on ${appointment.date.toLocaleDateString()}`,
-          unitPrice: appointment.fee,
-          quantity: 1,
-          discount: 0,
-          taxRate: 0,
-          taxAmount: 0,
-          totalAmount: appointment.fee,
-          appointmentId: appointment.id
-        });
+      // If first item is empty → replace it
+      if (this.invoiceItems.length === 1 && !this.invoiceItems.at(0).get('description')?.value) {
+        this.invoiceItems.at(0).patchValue(itemData);
       } else {
-        // Add as new item
-        this.addInvoiceItem({
-          description: `${appointment.type} with ${appointment.doctor} on ${appointment.date.toLocaleDateString()}`,
-          unitPrice: appointment.fee,
-          quantity: 1,
-          discount: 0,
-          taxRate: 0,
-          taxAmount: 0,
-          totalAmount: appointment.fee,
-          appointmentId: appointment.id
-        });
+        this.addInvoiceItem(itemData);
       }
 
       this.calculateTotals();
       this.isLoading = false;
-    }, 500);
-  }
+    },
 
-  // loadInvoiceData(id: number): void {
-  //   // Simulate API call
-  //   this.isLoading = true;
-  //   setTimeout(() => {
-  //     // Mock data - replace with actual API call
-  //     const invoice = {
-  //       id: id,
-  //       patientId: 2,
-  //       invoiceNumber: 'INV-2023-002',
-  //       invoiceDate: new Date('2023-06-12'),
-  //       dueDate: new Date('2023-06-27'),
-  //       status: 'Pending',
-  //       notes: 'Payment due within 15 days',
-  //       subTotal: 200.00,
-  //       taxRate: 5,
-  //       taxAmount: 10.00,
-  //       totalAmount: 210.00,
-  //       paidAmount: 0,
-  //       paymentDate: null,
-  //       paymentMethod: '',
-  //       invoiceItems: [
-  //         {
-  //           id: 1,
-  //           description: 'Consultation with Dr. Johnson on Jun 10, 2023',
-  //           unitPrice: 200.00,
-  //           quantity: 1,
-  //           discount: 0,
-  //           taxRate: 5,
-  //           taxAmount: 10.00,
-  //           totalAmount: 210.00,
-  //           appointmentId: 2
-  //         }
-  //       ]
-  //     };
-
-  //     // Load patient appointments
-  //     this.onPatientChange(invoice.patientId);
-
-  //     // Clear existing items
-  //     const itemsArray = this.invoiceForm.get('invoiceItems') as FormArray;
-  //     while (itemsArray.length) {
-  //       itemsArray.removeAt(0);
-  //     }
-
-  //     // Add invoice items
-  //     invoice.invoiceItems.forEach(item => {
-  //       this.addInvoiceItem(item);
-  //     });
-
-  //     // Set form values
-  //     this.invoiceForm.patchValue({
-  //       patientId: invoice.patientId,
-  //       invoiceDate: invoice.invoiceDate,
-  //       dueDate: invoice.dueDate,
-  //       status: invoice.status,
-  //       notes: invoice.notes,
-  //       subTotal: invoice.subTotal,
-  //       taxRate: invoice.taxRate,
-  //       taxAmount: invoice.taxAmount,
-  //       totalAmount: invoice.totalAmount,
-  //       paidAmount: invoice.paidAmount,
-  //       paymentDate: invoice.paymentDate,
-  //       paymentMethod: invoice.paymentMethod
-  //     });
-
-  //     this.isLoading = false;
-  //   }, 1000);
-  // }
+    error: err => {
+      console.error("Failed to load appointment", err);
+      this.snackBar.open("Error loading appointment", "Close", { duration: 3000 });
+      this.isLoading = false;
+    }
+  });
+}
 
 
+  // Load invoice for edit
   loadInvoiceData(id: number): void {
     this.isLoading = true;
-
     this.invoiceService.getInvoiceById(id).subscribe({
       next: (invoice: any) => {
-
-        // load patient appointments if required
         this.onPatientChange(invoice.patientId);
 
         const itemsArray = this.invoiceForm.get('invoiceItems') as FormArray;
         itemsArray.clear();
 
-        invoice.items?.forEach((item: any) => {
+        (invoice.items || []).forEach((it: any) => {
+          // detect type and prefill selectedItem so autocomplete has initial list
+          let detectedType = 'Manual Entry';
+          let selectedObj: any = null;
 
-          let detectedType = 'Manual';
-          let selectedItemObj = null;
-
-          // Detect type & retrieve matching object
-          if (item.appointment != null) {
-            detectedType = 'Consultation';
-            selectedItemObj = {
-              id: item.appointment?.id,
-              name: "Consultation",       // or item.description
-              fee: item.unitPrice,
-              tax: item.taxRate
-            };
-          }
-          else if (this.procedureList?.some(p => p.procedureName === item.description)) {
+          if (it.appointment) {
+            detectedType = 'Consultation (Appointment)';
+            selectedObj = { id: it.appointment.id, name: it.description, fee: it.unitPrice, tax: it.taxRate };
+          } else if (this.procedureList.some(p => p.procedureName === it.description)) {
             detectedType = 'Procedure';
-            const proc = this.procedureList.find(p => p.procedureName === item.description);
-            selectedItemObj = {
-              id: proc.id,
-              name: proc.procedureName,
-              fee: proc.fee,
-              tax: proc.taxRate
-            };
-          }
-          else if (this.medicineList?.some(m => m.medicineName === item.description)) {
+            const proc = this.procedureList.find(p => p.procedureName === it.description);
+            selectedObj = { id: proc.id, procedureName: proc.procedureName, fee: proc.fee, taxRate: proc.taxRate };
+          } else if (this.medicineList.some(m => m.medicineName === it.description)) {
             detectedType = 'Medicine';
-            const med = this.medicineList.find(m => m.medicineName === item.description);
-            selectedItemObj = {
-              id: med.id,
-              name: med.medicineName,
-              price: med.price,
-              tax: med.taxRate
-            };
+            const med = this.medicineList.find(m => m.medicineName === it.description);
+            selectedObj = { id: med.id, medicineName: med.medicineName, price: med.price, taxRate: med.taxRate };
           }
 
           this.addInvoiceItem({
-            id: item.id,
+            id: it.id,
             itemType: detectedType,
-            selectedItem: selectedItemObj,  // 👈 IMPORTANT
-            description: item.description,
-            unitPrice: item.unitPrice,
-            quantity: item.quantity,
-            discount: item.discount,
-            taxRate: item.taxRate,
-            taxAmount: item.taxAmount,
-            totalAmount: item.totalAmount,
-            appointmentId: item.appointment?.id ?? null
+            selectedItem: selectedObj,
+            description: it.description,
+            unitPrice: it.unitPrice,
+            quantity: it.quantity,
+            discount: it.discount,
+            taxRate: it.taxRate,
+            taxAmount: it.taxAmount,
+            totalAmount: it.totalAmount,
+            appointmentId: it.appointment?.id ?? null
           });
         });
-
 
         this.invoiceForm.patchValue({
           patientId: invoice.patientId,
@@ -562,45 +291,24 @@ export class InvoiceFormComponent implements OnInit {
         this.isLoading = false;
       },
       error: err => {
-        console.error("Failed to load invoice", err);
-        this.snackBar.open("Error loading invoice", "Close", { duration: 3000 });
+        console.error('Failed to load invoice', err);
+        this.snackBar.open('Error loading invoice', 'Close', { duration: 3000 });
         this.isLoading = false;
       }
     });
   }
 
-
-
-
+  // Reactive array accessor
   get invoiceItems() {
     return this.invoiceForm.get('invoiceItems') as FormArray;
   }
 
-
-  // addInvoiceItem(item: any = null): void {
-  //   const itemForm = this.fb.group({
-  //     id: [item?.id || 0],
-  //     itemType: [item?.itemType || '', Validators.required],
-  //     selectedItem: [item?.selectedItem || null, Validators.required],
-  //     description: [item?.description || '', Validators.required],
-  //     unitPrice: [item?.unitPrice || 0, Validators.required],
-  //     quantity: [item?.quantity || 1, Validators.required],
-  //     discount: [item?.discount || 0],
-  //     taxRate: [item?.taxRate || 0],
-  //     taxAmount: [item?.taxAmount || 0],
-  //     totalAmount: [item?.totalAmount || 0],
-  //     appointmentId: [item?.appointmentId || null]
-  //   });
-
-  //   this.invoiceItems.push(itemForm);
-  // }
-
-
+  // Add single row. Each row holds its own filteredList control for per-row autocomplete list.
   addInvoiceItem(item: any = null): void {
     const itemForm = this.fb.group({
       id: [item?.id || 0],
       itemType: [item?.itemType || '', Validators.required],
-      selectedItem: [null], // needed for autocomplete binding
+      selectedItem: [item?.selectedItem || null],
       description: [item?.description || '', Validators.required],
       unitPrice: [item?.unitPrice || 0, Validators.required],
       quantity: [item?.quantity || 1, Validators.required],
@@ -608,51 +316,165 @@ export class InvoiceFormComponent implements OnInit {
       taxRate: [item?.taxRate || 0],
       taxAmount: [item?.taxAmount || 0],
       totalAmount: [item?.totalAmount || 0],
-      appointmentId: [item?.appointmentId || null]
+      appointmentId: [item?.appointmentId || null],
+      filteredList: this.fb.control<any[]>([]) // per-row autocomplete options
     });
 
     this.invoiceItems.push(itemForm);
 
-    this.setupItemFiltering(itemForm);  // 💡 FIX — attach filtering listener
+    // if we loaded an item with itemType, prefill its filteredList
+    if (item?.itemType) {
+      const list = this.getFilteredData(item.itemType);
+      itemForm.get('filteredList')?.setValue(list);
+    }
+
+    // attach listeners
+    this.setupItemFiltering(itemForm);
+  }
+
+  removeInvoiceItem(index: number): void {
+    this.invoiceItems.removeAt(index);
+    this.calculateTotals();
   }
 
 
 
   setupItemFiltering(itemForm: FormGroup) {
 
-    // Reset selected item when billing type changes
-    itemForm.get('itemType')?.valueChanges.subscribe(type => {
-      itemForm.get('selectedItem')?.reset();
-      this.filteredBillingItems = []; // clear list on change
+  // When Billing Type changes → reset everything
+  itemForm.get('itemType')?.valueChanges.subscribe(type => {
+    const list = this.getFilteredData(type);
+    itemForm.get('filteredList')?.setValue(list);
+
+    itemForm.patchValue({
+      selectedItem: null,
+      description: '',
+      unitPrice: 0,
+      quantity: 1,
+      discount: 0,
+      taxRate: 0,
+      taxAmount: 0,
+      totalAmount: 0,
+      appointmentId: null
     });
 
-    // Handle autocomplete filtering reset
-    itemForm.get('selectedItem')?.valueChanges.subscribe(val => {
-      const type = itemForm.get('itemType')?.value;
-
-      if (!type) return;
-
-      // FIX — refresh correct list
-      this.filteredBillingItems = this.getFilteredData(type);
-    });
-  }
-
-
-  getFilteredData(type: string) {
-    if (type === 'Medicine') return [...this.medicineList];
-    if (type === 'Procedure') return [...this.procedureList];
-    return [];
-  }
-
-
-
-
-
-
-  removeInvoiceItem(index: number): void {
-    this.invoiceItems.removeAt(index);
     this.calculateTotals();
+  });
+
+  // When user types/selects in autocomplete
+  itemForm.get('selectedItem')?.valueChanges.subscribe(value => {
+
+    // If value is a string => user is typing, do nothing.
+    if (!value || typeof value !== 'object') return;
+
+    const type = itemForm.get('itemType')?.value;
+
+    let price = value.price ?? value.unitPrice ?? value.fee ?? 0;
+    let tax = value.taxRate ?? value.tax ?? 0;
+
+    const description =
+      value.medicineName ||
+      value.procedureName ||
+      value.name ||
+      value.description ||
+      '';
+
+    itemForm.patchValue({
+      description,
+      unitPrice: price,
+      quantity: 1,
+      taxRate: tax,
+      taxAmount: (price * tax) / 100,
+      totalAmount: price + (price * tax) / 100,
+      appointmentId: type === 'Consultation (Appointment)' ? value.id : itemForm.get('appointmentId')?.value
+    });
+
+    this.calculateTotals();
+  });
+
+}
+
+
+  // Called on input inside autocomplete input to update per-row filteredList
+  searchBillingItems(event: any, index: number) {
+    const q = (event.target.value || '').toLowerCase().trim();
+    const row = this.invoiceItems.at(index);
+    const type = row.get('itemType')?.value;
+
+    const list = this.getFilteredData(type);
+
+    const filtered = list.filter((item: any) => {
+      const label = (item.medicineName || item.procedureName || item.name || item.description || "")
+        .toString().toLowerCase();
+      return label.includes(q);
+    });
+
+    row.get('filteredList')?.setValue(filtered);
   }
+
+  // Called when user selects an option from the mat-autocomplete dropdown
+  onBillingItemSelected(selectedItem: any, index: number) {
+    const item = this.invoiceItems.at(index);
+
+    // Selected item object is handled by valueChanges in setupItemFiltering,
+    // but if you want immediate behaviour here too, do a quick patch:
+    if (selectedItem && typeof selectedItem === 'object') {
+      const price = selectedItem.price ?? selectedItem.unitPrice ?? selectedItem.fee ?? 0;
+      const tax = selectedItem.taxRate ?? selectedItem.tax ?? 0;
+      item.patchValue({
+        description: selectedItem.medicineName || selectedItem.procedureName || selectedItem.name || selectedItem.description || '',
+        unitPrice: price,
+        quantity: 1,
+        taxRate: tax,
+        taxAmount: (price * tax) / 100,
+        totalAmount: price + ((price * tax) / 100),
+        appointmentId: selectedItem.id ?? item.get('appointmentId')?.value ?? null
+      });
+      this.calculateTotals();
+    }
+  }
+
+  displayBillingItem(item: any): string {
+    if (!item) return '';
+    const name = item.medicineName || item.procedureName || item.name || item.description || 'Item';
+    const price = item.price ?? item.unitPrice ?? item.fee ?? 0;
+    return `${name} (₹${price})`;
+  }
+
+
+
+
+
+  loadItemOptions(index: number) {
+  const row = this.invoiceItems.at(index);
+  const type = row.get('itemType')?.value;
+
+  const list = this.getFilteredData(type);
+
+  // Safety fix for empty consultation list
+  if (type === 'Consultation (Appointment)' && this.appointments.length === 0) {
+    row.get('filteredList')?.setValue([]);
+  } else {
+    row.get('filteredList')?.setValue(list);
+  }
+
+  row.patchValue({
+    selectedItem: null,
+    description: '',
+    unitPrice: 0,
+    quantity: 1,
+    discount: 0,
+    taxRate: 0,
+    taxAmount: 0,
+    totalAmount: 0,
+    appointmentId: null
+  });
+
+  this.calculateTotals();
+}
+
+
+
 
   onItemValueChange(index: number): void {
     const item = this.invoiceItems.at(index);
@@ -661,16 +483,11 @@ export class InvoiceFormComponent implements OnInit {
     const discount = item.get('discount')?.value || 0;
     const taxRate = item.get('taxRate')?.value || 0;
 
-    // Calculate item total
     const subtotal = (unitPrice * quantity) - discount;
     const taxAmount = (subtotal * taxRate) / 100;
     const totalAmount = subtotal + taxAmount;
 
-    item.patchValue({
-      taxAmount: taxAmount,
-      totalAmount: totalAmount
-    }, { emitEvent: false });
-
+    item.patchValue({ taxAmount, totalAmount }, { emitEvent: false });
     this.calculateTotals();
   }
 
@@ -680,101 +497,89 @@ export class InvoiceFormComponent implements OnInit {
     let total = 0;
 
     for (let i = 0; i < this.invoiceItems.length; i++) {
-      const item = this.invoiceItems.at(i);
-      subTotal += (item.get('unitPrice')?.value || 0) * (item.get('quantity')?.value || 0) - (item.get('discount')?.value || 0);
-      totalTax += item.get('taxAmount')?.value || 0;
-      total += item.get('totalAmount')?.value || 0;
+      const it = this.invoiceItems.at(i);
+      const up = (it.get('unitPrice')?.value || 0) * (it.get('quantity')?.value || 0);
+      const discount = it.get('discount')?.value || 0;
+      const taxAmt = it.get('taxAmount')?.value || 0;
+      const totalAmt = it.get('totalAmount')?.value || 0;
+
+      subTotal += (up - discount);
+      totalTax += taxAmt;
+      total += totalAmt;
     }
 
-    // Update form values
-    this.invoiceForm.patchValue({
-      subTotal: subTotal,
-      taxAmount: totalTax,
-      totalAmount: total
-    });
+    this.invoiceForm.patchValue({ subTotal, taxAmount: totalTax, totalAmount: total }, { emitEvent: false });
   }
 
-
+  // Submit - create or update
   onSubmit(): void {
     if (this.invoiceForm.invalid) {
       this.markFormGroupTouched(this.invoiceForm);
       return;
     }
 
-    const formValue = this.invoiceForm.value;
+    const fv = this.invoiceForm.value;
 
-    const payload = {
-      id: this.invoiceId ?? 0, // required for update
-      patientId: formValue.patientId,
-      invoiceDate: formValue.invoiceDate.toISOString(),
-      dueDate: formValue.dueDate.toISOString(),
-      status: formValue.status,
-      notes: formValue.notes,
-      paidAmount: formValue.paidAmount,
-      paymentMethod: formValue.paymentMethod,
-      paymentDate: formValue.paymentDate ? formValue.paymentDate.toISOString() : null,
-
-      // Child items
-      items: formValue.invoiceItems.map((item: any) => ({
-        id: item.id ?? 0,                           // ★ needed for update
-        description: item.description,
-        unitPrice: item.unitPrice,
-        quantity: item.quantity,
-        discount: item.discount,
-        taxRate: item.taxRate,
-        appointmentId: item.appointmentId ?? null
+    const payload: any = {
+      id: this.invoiceId ?? 0,
+      patientId: fv.patientId,
+      invoiceDate: fv.invoiceDate instanceof Date ? fv.invoiceDate.toISOString() : fv.invoiceDate,
+      dueDate: fv.dueDate ? (fv.dueDate instanceof Date ? fv.dueDate.toISOString() : fv.dueDate) : null,
+      status: fv.status,
+      notes: fv.notes,
+      paidAmount: fv.paidAmount,
+      paymentMethod: fv.paymentMethod,
+      paymentDate: fv.paymentDate ? (fv.paymentDate instanceof Date ? fv.paymentDate.toISOString() : fv.paymentDate) : null,
+      items: fv.invoiceItems.map((it: any) => ({
+        id: it.id ?? 0,
+        description: it.description,
+        unitPrice: it.unitPrice,
+        quantity: it.quantity,
+        discount: it.discount,
+        taxRate: it.taxRate,
+        appointmentId: it.itemType === 'Consultation (Appointment)' ? it.appointmentId : null
       }))
     };
 
     this.isLoading = true;
+    const req = this.isEditMode ? this.invoiceService.updateInvoice(this.invoiceId!, payload) : this.invoiceService.createInvoice(payload);
 
-    const request = this.isEditMode
-      ? this.invoiceService.updateInvoice(this.invoiceId!, payload) // PUT call
-      : this.invoiceService.createInvoice(payload);                // POST call
-
-    request.subscribe({
+    req.subscribe({
       next: () => {
-        this.snackBar.open(
-          `Invoice ${this.isEditMode ? 'updated' : 'created'} successfully!`,
-          'Close',
-          { duration: 3000 }
-        );
+        this.snackBar.open(`Invoice ${this.isEditMode ? 'updated' : 'created'} successfully!`, 'Close', { duration: 3000 });
         this.router.navigate(['/billing']);
+        this.isLoading = false;
       },
       error: (err) => {
         console.error('Invoice save failed:', err);
         this.snackBar.open('Error saving invoice', 'Close', { duration: 3000 });
+        this.isLoading = false;
       }
     });
   }
 
-
-
-
-  // Helper to mark all form controls as touched for validation
   markFormGroupTouched(formGroup: FormGroup) {
     Object.values(formGroup.controls).forEach(control => {
       control.markAsTouched();
       if ((control as any).controls) {
-        if (control instanceof FormGroup) {
-          this.markFormGroupTouched(control);
-        } else if (control instanceof FormArray) {
-          for (let i = 0; i < control.length; i++) {
-            this.markFormGroupTouched(control.at(i) as FormGroup);
-          }
+        if (control instanceof FormGroup) this.markFormGroupTouched(control);
+        else if (control instanceof FormArray) {
+          for (let i = 0; i < control.length; i++) this.markFormGroupTouched(control.at(i) as FormGroup);
         }
       }
     });
   }
 
-  getPatientFullName(patientId: number): string {
-    const patient = this.patients.find(p => p.id === patientId);
-    return patient ? `${patient.firstName} ${patient.lastName}` : '';
+ 
+  getFilteredData(type: string) {
+  switch (type) {
+    case 'Medicine': return [...this.medicineList];
+    case 'Procedure': return [...this.procedureList];
+    case 'Consultation (Appointment)': return [...this.appointments];
+    default: return [];
   }
+}
 
-  addAppointmentToInvoice(appointmentId: number): void {
-    this.loadAppointmentDetails(appointmentId);
-  }
 
   cancel(): void {
     this.router.navigate(['/billing']);

@@ -35,15 +35,15 @@
           </div>
           <div class="info-row">
             <div class="info-label">Total Amount:</div>
-            <div class="info-value">${{ invoice.totalAmount.toFixed(2) }}</div>
+            <div class="info-value">₹{{ invoice.totalAmount.toFixed(2) }}</div>
           </div>
           <div class="info-row" *ngIf="invoice.paidAmount > 0">
             <div class="info-label">Amount Paid:</div>
-            <div class="info-value">${{ invoice.paidAmount.toFixed(2) }}</div>
+            <div class="info-value">₹&nbsp;{{ invoice.paidAmount.toFixed(2) }}</div>
           </div>
           <div class="info-row balance-row">
-            <div class="info-label">Remaining Balance:</div>
-            <div class="info-value">${{ calculateRemainingBalance().toFixed(2) }}</div>
+            <div class="info-label"> Balance:</div>
+            <div class="info-value">₹&nbsp;{{ calculateRemainingBalance().toFixed(2) }}</div>
           </div>
         </div>
       </mat-card-content>
@@ -55,11 +55,11 @@
           <mat-card-title>Payment Details</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-          <div class="form-row">
+          <div class="form-row mt-3" >
             <mat-form-field appearance="outline">
               <mat-label>Payment Amount</mat-label>
               <input matInput type="number" formControlName="amount" required>
-              <span matPrefix>$&nbsp;</span>
+              <span matPrefix>&nbsp; ₹ &nbsp;</span>
               <mat-error *ngIf="paymentForm?.get('amount')?.hasError('required')">
                 Payment amount is required
               </mat-error>
@@ -106,7 +106,7 @@
         </mat-card-content>
 
         <mat-card-actions align="end">
-          <button mat-button type="button" (click)="cancel()">Cancel</button>
+          <button mat-button type="button" class="mr-5" (click)="cancel()">Cancel</button>
           <button mat-raised-button color="primary" type="submit" [disabled]="paymentForm.invalid">
             Record Payment
           </button>
