@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: '/api'
+  apiUrl: 'https://priorities-care-joan-petite.trycloudflare.com/api'
 };

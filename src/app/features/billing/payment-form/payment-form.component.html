@@ -60,10 +60,10 @@
               <mat-label>Payment Amount</mat-label>
               <input matInput type="number" formControlName="amount" required>
               <span matPrefix>&nbsp; ₹ &nbsp;</span>
-              <mat-error *ngIf="paymentForm?.get('amount')?.hasError('required')">
+              <mat-error *ngIf="paymentForm.get('amount')?.hasError('required')">
                 Payment amount is required
               </mat-error>
-              <mat-error *ngIf="paymentForm?.get('amount')?.hasError('min')">
+              <mat-error *ngIf="paymentForm.get('amount')?.hasError('min')">
                 Payment amount must be greater than zero
               </mat-error>
             </mat-form-field>
@@ -73,7 +73,7 @@
               <input matInput [matDatepicker]="paymentDatePicker" formControlName="paymentDate" required>
               <mat-datepicker-toggle matSuffix [for]="paymentDatePicker"></mat-datepicker-toggle>
               <mat-datepicker #paymentDatePicker></mat-datepicker>
-              <mat-error *ngIf="paymentForm?.get('paymentDate')?.hasError('required')">
+              <mat-error *ngIf="paymentForm.get('paymentDate')?.hasError('required')">
                 Payment date is required
               </mat-error>
             </mat-form-field>
