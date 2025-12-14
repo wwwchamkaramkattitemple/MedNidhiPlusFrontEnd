@@ -29,7 +29,9 @@
   <div *ngIf="!isLoading && invoice" class="invoice-content">
     <div class="invoice-status-banner" [ngStyle]="{'background-color': getStatusColor(invoice.status)}">
       <span>{{ invoice.status }}</span>
-      <button *ngIf="invoice.status !== 'Paid' && invoice.status !== 'Cancelled'" 
+      <!-- *ngIf="invoice.status !== 'Paid' && invoice.status !== 'Cancelled'"  -->
+      <button 
+      *ngIf="invoice.status === 'Pending' || invoice.status === 'Overdue'"
               mat-raised-button 
               color="primary" 
               (click)="recordPayment()">

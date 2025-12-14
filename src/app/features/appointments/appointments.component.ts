@@ -197,31 +197,7 @@ export class AppointmentsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-//   deleteAppointment(id: number) {
-//     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-//       width: '350px',
-//       data: {
-//         title: 'Confirm Delete',
-//         message: 'Are you sure you want to delete this appointment? This action cannot be undone.'
-//       }
-//     });
 
-//     dialogRef.afterClosed().subscribe(result => {
-//       if (result) {
-//         // Option A: call API to delete (recommended)
-//         // const s = this.appointmentService.deleteAppointment(id).subscribe({
-//         //   next: () => {
-//         //     this.dataSource.data = this.dataSource.data.filter(item => item.id !== id);
-//         //   },
-//         //   error: (err) => console.error('Delete failed', err)
-//         // });
-//         // this.subs.push(s);
-
-//         // Option B: if API not yet available, remove locally
-//         this.dataSource.data = this.dataSource.data.filter(item => item.id !== id);
-//       }
-//     });
-//   }
 
 deleteAppointment(id: number) {
   const dialogRef = this.dialog.open(ConfirmDialogComponent, {

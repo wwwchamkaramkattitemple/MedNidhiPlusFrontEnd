@@ -1,85 +1,3 @@
-// .appointment-detail-container {
-//   padding: 20px;
-//   max-width: 800px;
-//   margin: 0 auto;
-
-//   .appointment-detail-header {
-//     display: flex;
-//     justify-content: space-between;
-//     align-items: center;
-//     margin-bottom: 20px;
-//     flex-wrap: wrap;
-
-//     h1 {
-//       margin: 0;
-//     }
-
-//     .header-actions {
-//       display: flex;
-//       gap: 10px;
-//       margin-top: 10px;
-
-//       @media (max-width: 600px) {
-//         flex-direction: column;
-//         width: 100%;
-//       }
-//     }
-
-//     @media (max-width: 768px) {
-//       flex-direction: column;
-//       align-items: flex-start;
-//     }
-//   }
-
-//   .loading-spinner {
-//     display: flex;
-//     justify-content: center;
-//     align-items: center;
-//     height: 300px;
-//   }
-
-//   .appointment-content {
-//     display: flex;
-//     flex-direction: column;
-//     gap: 20px;
-//   }
-
-//   .info-grid {
-//     display: grid;
-//     grid-template-columns: repeat(2, 1fr);
-//     gap: 20px;
-//     margin-top: 20px;
-
-//     @media (max-width: 768px) {
-//       grid-template-columns: 1fr;
-//     }
-
-//     .info-item {
-//       &.full-width {
-//         grid-column: 1 / -1;
-//       }
-
-//       .info-label {
-//         font-weight: 500;
-//         color: rgba(0, 0, 0, 0.6);
-//         margin-bottom: 5px;
-//       }
-
-//       .info-value {
-//         font-size: 16px;
-//         display: flex;
-//         align-items: center;
-//         gap: 10px;
-//       }
-
-//       .notes-content {
-//         white-space: pre-line;
-//         line-height: 1.5;
-//       }
-//     }
-//   }
-// }
-
 .appointment-detail-container {
   padding: 20px;
 }
@@ -244,3 +162,26 @@ table {
   .mat-column-status {
     width: 120px;
   }
+
+
+  .appointment-title {
+  font-weight: 600;
+}
+
+.appointment-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.status-chip {
+  height: 26px;
+}

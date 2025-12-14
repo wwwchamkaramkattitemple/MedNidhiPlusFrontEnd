@@ -95,39 +95,6 @@ export class InvoicesComponent implements OnInit {
   }
 
 
-  // applyFilter(event: Event) {
-  //   const filterValue = (event.target as HTMLInputElement).value;
-  //   this.dataSource.filter = filterValue.trim().toLowerCase();
-
-  //   if (this.dataSource.paginator) {
-  //     this.dataSource.paginator.firstPage();
-  //   }
-  // }
-
-  // filterInvoices() {
-  //   this.dataSource.filterPredicate = (data: any, filter: string) => {
-  //     // Custom filter function
-  //     const searchStr = filter.toLowerCase();
-  //     const statusMatch = !this.filterStatus || data.status === this.filterStatus;
-
-  //     // Date range filter
-  //     let dateMatch = true;
-  //     if (this.filterDateFrom) {
-  //       dateMatch = dateMatch && new Date(data.date) >= new Date(this.filterDateFrom);
-  //     }
-  //     if (this.filterDateTo) {
-  //       dateMatch = dateMatch && new Date(data.date) <= new Date(this.filterDateTo);
-  //     }
-
-  //     return statusMatch && dateMatch &&
-  //       (data.invoiceNumber.toLowerCase().includes(searchStr) ||
-  //         data.patientName.toLowerCase().includes(searchStr) ||
-  //         data.status.toLowerCase().includes(searchStr));
-  //   };
-
-  //   // Trigger filter
-  //   this.dataSource.filter = this.dataSource.filter || ' ';
-  // }
 
   applyFilter(event: Event) {
     this.searchText = (event.target as HTMLInputElement).value?.trim().toLowerCase() || '';
@@ -172,8 +139,6 @@ export class InvoicesComponent implements OnInit {
     return statusMatch && dateMatch && textMatch;
   };
 
-  // Trigger filter refresh: we don't rely on the actual string - just trigger change detection for DataSource
-  // Using a random token is fine because predicate ignores it, but keep it short and explicit:
   this.dataSource.filter = (Math.random()).toString();
   if (this.dataSource.paginator) this.dataSource.paginator.firstPage();
 }
