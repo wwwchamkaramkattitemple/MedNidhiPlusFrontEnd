@@ -26,6 +26,10 @@ export class InvoiceService {
         return this.http.get<any>(`${this.apiUrl}/invoice/${id}`, { headers: this.getAuthHeaders() });
     }
 
+    getInvoiceDetail(id: number) {
+        return this.http.get<any>(`${this.apiUrl}/invoice/${id}/detail`, { headers: this.getAuthHeaders() });
+    }
+
     createInvoice(invoiceData: any): Observable<any> {
         return this.http.post(`${this.apiUrl}/invoice`, invoiceData, { headers: this.getAuthHeaders(), });
     }
@@ -41,6 +45,11 @@ export class InvoiceService {
     getPatientInvoicesByPatientId(patientId: number) {
         return this.http.get<any[]>(`${this.apiUrl}/invoice/patient/${patientId}`, { headers: this.getAuthHeaders() });
     }
+
+    recordPayment(invoiceId: number, payload: any) {
+        return this.http.post(`${this.apiUrl}/invoice/${invoiceId}/payment`, payload, { headers: this.getAuthHeaders() } );
+    }
+
 
 
     getAuthHeaders(): HttpHeaders {

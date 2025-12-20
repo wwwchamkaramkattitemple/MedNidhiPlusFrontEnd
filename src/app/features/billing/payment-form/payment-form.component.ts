@@ -10,6 +10,7 @@ import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, DateAdapter } from '@angular/materia
 import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 import * as _moment from 'moment';
 import 'moment/locale/en-gb';
+import { InvoiceService } from '../../../../services/invoice.service';
 
 export const MY_DATE_FORMATS = {
   parse: { dateInput: 'DD/MM/YYYY' },
@@ -44,7 +45,8 @@ export class PaymentFormComponent implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private invoiceService: InvoiceService
   ) { }
 
   ngOnInit(): void {
@@ -64,68 +66,56 @@ export class PaymentFormComponent implements OnInit {
   }
 
   loadInvoiceData(): void {
-    // Simulate API call to get invoice data
-    setTimeout(() => {
-      this.invoice = {
-        id: this.invoiceId,
-        invoiceNumber: 'INV-' + Math.floor(1000 + Math.random() * 9000),
-        invoiceDate: new Date(),
-        dueDate: new Date(new Date().setDate(new Date().getDate() + 30)),
-        status: 'Pending',
-        patientId: '12345',
-        patient: {
-          id: '12345',
-          firstName: 'John',
-          lastName: 'Doe',
-          email: 'john.doe@example.com',
-          phone: '(555) 123-4567'
-        },
-        subTotal: 225,
-        taxAmount: 15.75,
-        totalAmount: 240.75,
-        paidAmount: 0
-      };
+    if (!this.invoiceId) return;
 
-      // Set default amount to remaining balance
-      this.paymentForm?.patchValue({
-        amount: this.calculateRemainingBalance()
-      });
+    this.isLoading = true;
 
-      this.isLoading = false;
-    }, 1000);
+    this.invoiceService.getInvoiceById(+this.invoiceId).subscribe({
+      next: (res) => {
+        this.invoice = res;
+
+        this.paymentForm.patchValue({
+          amount: this.calculateRemainingBalance(),
+          paymentDate: new Date()
+        });
+
+        this.isLoading = false;
+      },
+      error: () => {
+        this.snackBar.open('Failed to load invoice', 'Close', { duration: 3000 });
+        this.router.navigate(['/billing']);
+      }
+    });
   }
+
 
   calculateRemainingBalance(): number {
     return this.invoice?.totalAmount - (this.invoice?.paidAmount || 0);
   }
 
   onSubmit(): void {
-    if (this.paymentForm?.invalid) {
+    if (this.paymentForm.invalid || !this.invoiceId) return;
+
+    const remaining = this.calculateRemainingBalance();
+    const amount = this.paymentForm.value.amount;
+
+    if (amount > remaining) {
+      this.snackBar.open('Payment amount exceeds balance', 'Close', { duration: 3000 });
       return;
     }
 
-    const paymentData = {
-      ...this.paymentForm?.value,
-      invoiceId: this.invoiceId
-    };
-
-    // Validate payment amount doesn't exceed remaining balance
-    const remainingBalance = this.calculateRemainingBalance();
-    if (paymentData.amount > remainingBalance) {
-      this.snackBar.open('Payment amount cannot exceed the remaining balance', 'Close', {
-        duration: 3000
+    this.invoiceService.recordPayment(+this.invoiceId, this.paymentForm.value)
+      .subscribe({
+        next: () => {
+          this.snackBar.open('Payment recorded successfully', 'Close', { duration: 3000 });
+          this.router.navigate(['/billing', this.invoiceId]);
+        },
+        error: err => {
+          this.snackBar.open(err.error || 'Payment failed', 'Close', { duration: 3000 });
+        }
       });
-      return;
-    }
-
-    // Simulate API call to save payment
-    setTimeout(() => {
-      this.snackBar.open('Payment recorded successfully', 'Close', {
-        duration: 3000
-      });
-      this.router.navigate(['/billing/detail', this.invoiceId]);
-    }, 1000);
   }
+
 
   cancel(): void {
     this.router.navigate(['/billing/detail', this.invoiceId]);

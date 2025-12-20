@@ -13,10 +13,10 @@
       <button mat-stroked-button (click)="sendInvoice()">
         <mat-icon>email</mat-icon> Send
       </button>
-      <button mat-stroked-button color="primary" (click)="editInvoice()">
+      <button mat-stroked-button color="primary" (click)="editInvoice()" *ngIf="!invoice?.isLocked">
         <mat-icon>edit</mat-icon> Edit
       </button>
-      <button mat-stroked-button color="warn" (click)="deleteInvoice()">
+      <button mat-stroked-button color="warn" (click)="deleteInvoice()" *ngIf="!invoice?.isLocked">
         <mat-icon>delete</mat-icon> Delete
       </button>
     </div>
@@ -27,9 +27,8 @@
   </div>
 
   <div *ngIf="!isLoading && invoice" class="invoice-content">
-    <div class="invoice-status-banner" [ngStyle]="{'background-color': getStatusColor(invoice.status)}">
+    <!-- <div class="invoice-status-banner" [ngStyle]="{'background-color': getStatusColor(invoice.status)}">
       <span>{{ invoice.status }}</span>
-      <!-- *ngIf="invoice.status !== 'Paid' && invoice.status !== 'Cancelled'"  -->
       <button 
       *ngIf="invoice.status === 'Pending' || invoice.status === 'Overdue'"
               mat-raised-button 
@@ -37,7 +36,28 @@
               (click)="recordPayment()">
         <mat-icon>payments</mat-icon> Record Payment
       </button>
-    </div>
+    </div> -->
+
+    <div class="invoice-status-banner"
+     [ngStyle]="{'background-color': getStatusColor(invoice.status)}">
+
+  <span>{{ invoice.status }}</span>
+
+  <!-- 🔒 Lock indicator -->
+  <mat-icon *ngIf="invoice.isLocked" class="ml-10">lock</mat-icon>
+
+  <!-- 💰 Record Payment -->
+  <button
+    *ngIf="!invoice.isLocked"
+    mat-raised-button
+    color="primary"
+    (click)="recordPayment()">
+    <mat-icon>payments</mat-icon> Record Payment
+  </button>
+
+</div>
+
+
 
     <div class="invoice-info-section">
       <mat-card>
@@ -78,7 +98,7 @@
           <div class="info-grid">
             <div class="info-row">
               <div class="info-label">Name:</div>
-              <div class="info-value">{{ invoice.patient.firstName }} {{ invoice.patient.lastName }}</div>
+              <div class="info-value">{{ invoice.patient.fullName }}</div>
             </div>
             <div class="info-row">
               <div class="info-label">Email:</div>
@@ -90,7 +110,7 @@
             </div>
             <div class="info-row">
               <div class="info-label">Address:</div>
-              <div class="info-value">{{ invoice.patient.address }}</div>
+              <div class="info-value">{{ invoice.patient.address ?? '' }}</div>
             </div>
           </div>
         </mat-card-content>
@@ -136,13 +156,15 @@
           <ng-container matColumnDef="taxAmount">
             <th mat-header-cell *matHeaderCellDef>Tax Amount</th>
             <td mat-cell *matCellDef="let item">&nbsp;&#8377;&nbsp;{{ item.taxAmount.toFixed(2) }}</td>
-            <td mat-footer-cell *matFooterCellDef><strong>&nbsp;&#8377;&nbsp;{{ invoice.taxAmount.toFixed(2) }}</strong></td>
+            <td mat-footer-cell *matFooterCellDef><strong>&nbsp;&#8377;&nbsp;{{ invoice.taxAmount.toFixed(2) }}</strong>
+            </td>
           </ng-container>
 
           <ng-container matColumnDef="totalAmount">
             <th mat-header-cell *matHeaderCellDef>Total</th>
             <td mat-cell *matCellDef="let item">&nbsp;&#8377;&nbsp;{{ item.totalAmount.toFixed(2) }}</td>
-            <td mat-footer-cell *matFooterCellDef><strong>&nbsp;&#8377;&nbsp;{{ invoice.totalAmount.toFixed(2) }}</strong></td>
+            <td mat-footer-cell *matFooterCellDef><strong>&nbsp;&#8377;&nbsp;{{ invoice.totalAmount.toFixed(2)
+                }}</strong></td>
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

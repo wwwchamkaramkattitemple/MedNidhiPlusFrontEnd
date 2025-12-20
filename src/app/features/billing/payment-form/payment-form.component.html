@@ -23,7 +23,7 @@
           </div>
           <div class="info-row">
             <div class="info-label">Patient:</div>
-            <div class="info-value">{{ invoice.patient.firstName }} {{ invoice.patient.lastName }}</div>
+            <div class="info-value">{{ invoice.patientName}} </div>
           </div>
           <div class="info-row">
             <div class="info-label">Invoice Date:</div>
@@ -107,7 +107,7 @@
 
         <mat-card-actions align="end">
           <button mat-button type="button" class="mr-5" (click)="cancel()">Cancel</button>
-          <button mat-raised-button color="primary" type="submit" [disabled]="paymentForm.invalid">
+          <button mat-raised-button color="primary" type="submit" [disabled]="paymentForm.invalid || calculateRemainingBalance() <= 0">
             Record Payment
           </button>
         </mat-card-actions>

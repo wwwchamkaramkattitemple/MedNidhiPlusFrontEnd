@@ -27,7 +27,7 @@ export class InvoiceDetailComponent implements OnInit {
     private router: Router,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private invoiceService:InvoiceService
+    private invoiceService: InvoiceService
   ) { }
 
   ngOnInit(): void {
@@ -35,64 +35,13 @@ export class InvoiceDetailComponent implements OnInit {
     this.loadInvoiceData();
   }
 
-  // loadInvoiceData(): void {
-  //   // Simulate API call to get invoice data
-  //   setTimeout(() => {
-  //     this.invoice = {
-  //       id: this.invoiceId,
-  //       invoiceNumber: 'INV-' + Math.floor(1000 + Math.random() * 9000),
-  //       invoiceDate: new Date(),
-  //       dueDate: new Date(new Date().setDate(new Date().getDate() + 30)),
-  //       status: 'Pending',
-  //       patientId: '12345',
-  //       patient: {
-  //         id: '12345',
-  //         firstName: 'John',
-  //         lastName: 'Doe',
-  //         email: 'john.doe@example.com',
-  //         phone: '(555) 123-4567',
-  //         address: '123 Main St, Anytown, CA 12345'
-  //       },
-  //       items: [
-  //         {
-  //           id: '1',
-  //           description: 'Initial Consultation',
-  //           quantity: 1,
-  //           unitPrice: 150,
-  //           discount: 0,
-  //           taxRate: 7,
-  //           taxAmount: 10.5,
-  //           totalAmount: 160.5
-  //         },
-  //         {
-  //           id: '2',
-  //           description: 'Blood Test',
-  //           quantity: 1,
-  //           unitPrice: 75,
-  //           discount: 0,
-  //           taxRate: 7,
-  //           taxAmount: 5.25,
-  //           totalAmount: 80.25
-  //         }
-  //       ],
-  //       subTotal: 225,
-  //       taxAmount: 15.75,
-  //       totalAmount: 240.75,
-  //       paidAmount: 0,
-  //       paymentDate: null,
-  //       paymentMethod: null,
-  //       notes: 'Please pay within 30 days.',
-  //       createdAt: new Date(new Date().setDate(new Date().getDate() - 5)),
-  //       updatedAt: new Date()
-  //     };
-  //     this.isLoading = false;
-  //   }, 1000);
-  // }
 
-    loadInvoiceData(): void {
+
+  loadInvoiceData(): void {
     this.isLoading = true;
 
-    this.invoiceService.getInvoiceById(this.invoiceId).subscribe({
+    this.invoiceService.getInvoiceDetail(this.invoiceId).subscribe({
+     
       next: (res) => {
         this.invoice = {
           ...res,
@@ -133,14 +82,14 @@ export class InvoiceDetailComponent implements OnInit {
   }
 
   recordPayment(): void {
-     this.router.navigate(['/billing', this.invoiceId, 'payment']);
+    this.router.navigate(['/billing', this.invoiceId, 'payment']);
   }
 
   editInvoice(): void {
     this.router.navigate(['/billing', this.invoiceId, 'edit']);
   }
 
-   deleteInvoice() {
+  deleteInvoice() {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '350px',
       data: {
