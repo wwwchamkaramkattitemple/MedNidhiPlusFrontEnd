@@ -47,9 +47,12 @@ export class InvoiceService {
     }
 
     recordPayment(invoiceId: number, payload: any) {
-        return this.http.post(`${this.apiUrl}/invoice/${invoiceId}/payment`, payload, { headers: this.getAuthHeaders() } );
+        return this.http.post(`${this.apiUrl}/invoice/${invoiceId}/payment`, payload, { headers: this.getAuthHeaders() });
     }
 
+    downloadInvoicePdf(invoiceId: number) {
+        return this.http.get(`${this.apiUrl}/invoice/${invoiceId}/pdf`,{responseType: 'blob',headers: this.getAuthHeaders()});
+    }
 
 
     getAuthHeaders(): HttpHeaders {

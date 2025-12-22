@@ -116,10 +116,46 @@ export class InvoiceDetailComponent implements OnInit {
     });
   }
 
-  printInvoice(): void {
-    // Implement print functionality
-    window.print();
-  }
+ printInvoice(): void {
+  this.invoiceService.downloadInvoicePdf(this.invoiceId)
+    .subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = '0';
+        iframe.src = url;
+
+        document.body.appendChild(iframe);
+
+        iframe.onload = () => {
+          setTimeout(() => {
+            const win = iframe.contentWindow;
+            if (!win) {
+              alert('Print window blocked');
+              return;
+            }
+            win.focus();
+            win.print();
+
+            URL.revokeObjectURL(url);
+          }, 500);
+        };
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Unable to load invoice PDF');
+      }
+    });
+}
+
+
+
 
   sendInvoice(): void {
     // Simulate sending invoice by email
