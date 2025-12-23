@@ -10,7 +10,7 @@
       <button mat-stroked-button (click)="printInvoice()">
         <mat-icon>print</mat-icon> Print
       </button>
-      <button mat-stroked-button (click)="sendInvoice()">
+      <button mat-stroked-button (click)="sendInvoiceEmail()">
         <mat-icon>email</mat-icon> Send
       </button>
       <button mat-stroked-button color="primary" (click)="editInvoice()" *ngIf="!invoice?.isLocked">

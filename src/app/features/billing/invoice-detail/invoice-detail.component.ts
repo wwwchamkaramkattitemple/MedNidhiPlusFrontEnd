@@ -41,7 +41,7 @@ export class InvoiceDetailComponent implements OnInit {
     this.isLoading = true;
 
     this.invoiceService.getInvoiceDetail(this.invoiceId).subscribe({
-     
+
       next: (res) => {
         this.invoice = {
           ...res,
@@ -116,53 +116,75 @@ export class InvoiceDetailComponent implements OnInit {
     });
   }
 
- printInvoice(): void {
-  this.invoiceService.downloadInvoicePdf(this.invoiceId)
-    .subscribe({
-      next: (blob) => {
-        const url = URL.createObjectURL(blob);
+  printInvoice(): void {
+    this.invoiceService.downloadInvoicePdf(this.invoiceId)
+      .subscribe({
+        next: (blob) => {
+          const url = URL.createObjectURL(blob);
 
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'fixed';
-        iframe.style.right = '0';
-        iframe.style.bottom = '0';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
-        iframe.style.border = '0';
-        iframe.src = url;
+          const iframe = document.createElement('iframe');
+          iframe.style.position = 'fixed';
+          iframe.style.right = '0';
+          iframe.style.bottom = '0';
+          iframe.style.width = '0';
+          iframe.style.height = '0';
+          iframe.style.border = '0';
+          iframe.src = url;
 
-        document.body.appendChild(iframe);
+          document.body.appendChild(iframe);
 
-        iframe.onload = () => {
-          setTimeout(() => {
-            const win = iframe.contentWindow;
-            if (!win) {
-              alert('Print window blocked');
-              return;
-            }
-            win.focus();
-            win.print();
+          iframe.onload = () => {
+            setTimeout(() => {
+              const win = iframe.contentWindow;
+              if (!win) {
+                alert('Print window blocked');
+                return;
+              }
+              win.focus();
+              win.print();
 
-            URL.revokeObjectURL(url);
-          }, 500);
-        };
+              URL.revokeObjectURL(url);
+            }, 500);
+          };
+        },
+        error: (err) => {
+          console.error(err);
+          alert('Unable to load invoice PDF');
+        }
+      });
+  }
+
+
+
+
+  // sendInvoice(): void {
+  //   // Simulate sending invoice by email
+  //   this.snackBar.open(`Invoice sent to ${this.invoice.patient.email}`, 'Close', {
+  //     duration: 3000
+  //   });
+  // }
+
+  sendInvoiceEmail() {
+    this.invoiceService.emailInvoice(this.invoice.id).subscribe({
+      next: () => {
+        this.snackBar.open(
+          'Invoice emailed successfully',
+          'Close',
+          { duration: 3000 }
+        );
       },
-      error: (err) => {
+      error: err => {
         console.error(err);
-        alert('Unable to load invoice PDF');
+        this.snackBar.open(
+          'Failed to send invoice email',
+          'Close',
+          { duration: 3000 }
+        );
       }
     });
-}
-
-
-
-
-  sendInvoice(): void {
-    // Simulate sending invoice by email
-    this.snackBar.open(`Invoice sent to ${this.invoice.patient.email}`, 'Close', {
-      duration: 3000
-    });
   }
+
+
 
   formatDate(date: Date): string {
     if (!date) return 'N/A';
