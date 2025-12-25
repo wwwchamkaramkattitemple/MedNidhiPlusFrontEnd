@@ -23,21 +23,62 @@ export class SystemSettingsComponent implements OnInit {
     private router: Router,
     private snackBar: MatSnackBar,
     private settingsService: SettingsService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
+    this.handlePrintModeChanges();
     this.loadSettingsData();
   }
 
+  // initForm(): void {
+  //   this.settingsForm = this.fb.group({
+  //     clinicName: ['', [Validators.required, Validators.maxLength(100)]],
+  //     feePriority: ['Default', Validators.required],
+  //     defaultRevisitDays: [15, [Validators.required, Validators.min(1)]],
+  //     defaultFee: [200, [Validators.required, Validators.min(2)]]
+  //   });
+  // }
+
   initForm(): void {
     this.settingsForm = this.fb.group({
+      // Clinic
       clinicName: ['', [Validators.required, Validators.maxLength(100)]],
+      clinicAddress: [''],
+      clinicPhone: [''],
+      clinicEmail: ['', Validators.email],
+      clinicGstNumber: [''],
+
+      // Billing
       feePriority: ['Default', Validators.required],
       defaultRevisitDays: [15, [Validators.required, Validators.min(1)]],
-      defaultFee: [200, [Validators.required, Validators.min(2)]]
+      defaultFee: [200, [Validators.required, Validators.min(1)]],
+
+      // Invoice Print
+      defaultInvoicePrintMode: ['Normal', Validators.required],
+      defaultInvoiceDesign: ['Classic', Validators.required],
+
+      // PDF Messages
+      pdfHeaderMessage: [''],
+      pdfFooterMessage: [''],
+      pdfThankYouMessage: ['Thank you for choosing us']
     });
   }
+
+  handlePrintModeChanges(): void {
+    const printModeCtrl = this.settingsForm.get('defaultInvoicePrintMode');
+    const designCtrl = this.settingsForm.get('defaultInvoiceDesign');
+
+    printModeCtrl?.valueChanges.subscribe(mode => {
+      if (mode === 'Thermal') {
+        designCtrl?.disable({ emitEvent: false });
+      } else {
+        designCtrl?.enable({ emitEvent: false });
+      }
+    });
+  }
+
+
 
   loadSettingsData(): void {
     this.isLoading = true;

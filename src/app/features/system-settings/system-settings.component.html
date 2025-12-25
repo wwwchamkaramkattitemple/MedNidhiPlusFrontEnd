@@ -12,8 +12,8 @@
         <mat-card>
             <mat-card-content>
 
-                <div class="form-row-mode">
-                    <!-- settings Name -->
+                <!-- <div class="form-row-mode">
+                   
                     <mat-form-field appearance="outline">
                         <mat-label>Clinic Name</mat-label>
                         <input matInput formControlName="clinicName" required />
@@ -22,7 +22,7 @@
                         </mat-error>
                     </mat-form-field>
 
-                    <!-- Fee Priority-->
+                  
                     <mat-form-field appearance="outline">
                         <mat-label>Fee Priority</mat-label>
                         <mat-select formControlName="feePriority" required>
@@ -36,7 +36,7 @@
                         </mat-error>
                     </mat-form-field>
 
-                     <!-- Default Revisit Days -->
+                   
                     <mat-form-field appearance="outline">
                         <mat-label>Default Revisit Days</mat-label>
                         <input matInput type="number" formControlName="defaultRevisitDays" placeholder="e.g., 15" />
@@ -45,7 +45,7 @@
                         </mat-error>
                     </mat-form-field>
 
-                    <!-- Default Consultation Fee -->
+                   
                     <mat-form-field appearance="outline">
                         <mat-label>Default Consultation Fee</mat-label>
                         <input matInput type="number" placeholder="e.g., 500"
@@ -53,9 +53,111 @@
                     </mat-form-field>
 
 
+                </div> -->
+
+
+                <h3 class="section-title">Clinic Information</h3>
+
+                <div class="form-row-mode">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Clinic Name</mat-label>
+                        <input matInput formControlName="clinicName">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Phone</mat-label>
+                        <input matInput formControlName="clinicPhone">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Email</mat-label>
+                        <input matInput formControlName="clinicEmail">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>GST Number</mat-label>
+                        <input matInput formControlName="clinicGstNumber">
+                    </mat-form-field>
                 </div>
 
-              
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Clinic Address</mat-label>
+                    <textarea matInput rows="2" formControlName="clinicAddress"></textarea>
+                </mat-form-field>
+
+                <h3 class="section-title">Billing Defaults</h3>
+
+                <div class="form-row-mode">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Fee Priority</mat-label>
+                        <mat-select formControlName="feePriority">
+                            <mat-option value="Default">Default</mat-option>
+                            <mat-option value="Doctor">Doctor</mat-option>
+                            <mat-option value="Department">Department</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Default Revisit Days</mat-label>
+                        <input matInput type="number" formControlName="defaultRevisitDays">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Default Consultation Fee</mat-label>
+                        <input matInput type="number" formControlName="defaultFee">
+                    </mat-form-field>
+                </div>
+
+
+                <h3 class="section-title">Invoice Print Defaults</h3>
+
+                <div class="form-row-mode">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Print Mode</mat-label>
+                        <mat-select formControlName="defaultInvoicePrintMode">
+                            <mat-option value="Normal">Normal (A4)</mat-option>
+                            <mat-option value="Thermal">Thermal (80mm)</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Invoice Design</mat-label>
+                        <mat-select formControlName="defaultInvoiceDesign"
+                            [disabled]="settingsForm.get('defaultInvoicePrintMode')?.value === 'Thermal'">
+                            <mat-option value="Classic">Classic</mat-option>
+                            <mat-option value="Modern">Modern</mat-option>
+                            <mat-option value="Minimal">Minimal</mat-option>
+                        </mat-select>
+                        <mat-hint *ngIf="settingsForm.get('defaultInvoicePrintMode')?.value === 'Thermal'">
+                            Thermal print uses a fixed layout
+                        </mat-hint>
+                    </mat-form-field>
+
+                </div>
+
+
+                <h3 class="section-title">PDF Messages</h3>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>PDF Header Message</mat-label>
+                    <textarea matInput rows="2" formControlName="pdfHeaderMessage"></textarea>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>PDF Footer Message</mat-label>
+                    <textarea matInput rows="2" formControlName="pdfFooterMessage"></textarea>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Thank You Message</mat-label>
+                    <textarea matInput rows="2" formControlName="pdfThankYouMessage"></textarea>
+                </mat-form-field>
+
+
+
+
 
 
             </mat-card-content>
