@@ -26,24 +26,14 @@ import { ProcedureFormComponent } from './features/procedures/procedure-form/pro
 import { MedicineCategoryComponent } from './features/medicine-category/medicine-category.component';
 import { MedicineCategoryFormComponent } from './features/medicine-category/medicine-category-form/medicine-category-form.component';
 import { PaymentFormComponent } from './features/billing/payment-form/payment-form.component';
-// import { ProcessfilesComponent } from './features/processfiles/processfiles.component';
+import { AuthGuard } from './features/authentication/auth.guard';
 
 export const appRoutes: Routes = [
-  // Dashboard routes
-  { path: 'dashboard', component: DashboardComponent },
-  // Patient routes
+
+  // Redirect root → login
   { path: '', redirectTo: '/authentication/login', pathMatch: 'full' },
 
-
-  // { path: 'processfiles', component: ProcessfilesComponent },
-
-  //Processed Files Routes
-  // {
-  //   path: 'processfiles',
-  //   loadChildren: () =>
-  //     import('./features/processfiles/processfiles.routes').then((m) => m.ProcessFilesRoutes),
-  // },
-
+  // Authentication (public)
   {
     path: '',
     component: BlankComponent,
@@ -58,67 +48,64 @@ export const appRoutes: Routes = [
     ],
   },
 
-  // Patient routes
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: 'patients', component: PatientsComponent },
-  { path: 'patients/new', component: PatientFormComponent },
-  { path: 'patients/:id', component: PatientDetailComponent },
-  { path: 'patients/:id/edit', component: PatientFormComponent },
+  // Dashboard (protected)
+  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
+
+  // Patient routes (protected)
+  { path: 'patients', component: PatientsComponent, canActivate: [AuthGuard] },
+  { path: 'patients/new', component: PatientFormComponent, canActivate: [AuthGuard] },
+  { path: 'patients/:id', component: PatientDetailComponent, canActivate: [AuthGuard] },
+  { path: 'patients/:id/edit', component: PatientFormComponent, canActivate: [AuthGuard] },
 
   // Appointments routes
-  { path: 'appointments', component: AppointmentsComponent },
-  { path: 'appointments/new', component: AppointmentFormComponent },
-  { path: 'appointments/:id', component: AppointmentDetailComponent },
-  { path: 'appointments/:id/edit', component: AppointmentFormComponent },
+  { path: 'appointments', component: AppointmentsComponent, canActivate: [AuthGuard] },
+  { path: 'appointments/new', component: AppointmentFormComponent, canActivate: [AuthGuard] },
+  { path: 'appointments/:id', component: AppointmentDetailComponent, canActivate: [AuthGuard] },
+  { path: 'appointments/:id/edit', component: AppointmentFormComponent, canActivate: [AuthGuard] },
 
   // Billing routes
   //{ path: 'billing/new', component: PaymentFormComponent },
-  { path: 'billing', component: InvoicesComponent },
-  { path: 'billing/new', component: InvoiceFormComponent },
-  { path: 'billing/:id', component: InvoiceDetailComponent },
-  { path: 'billing/:id/edit', component: InvoiceFormComponent },
-  { path: 'billing/:id/payment', component: PaymentFormComponent },
-  { path: 'billing/detail/:id', component: InvoiceDetailComponent },
+  { path: 'billing', component: InvoicesComponent,canActivate: [AuthGuard]  },
+  { path: 'billing/new', component: InvoiceFormComponent,canActivate: [AuthGuard]  },
+  { path: 'billing/:id', component: InvoiceDetailComponent,canActivate: [AuthGuard]  },
+  { path: 'billing/:id/edit', component: InvoiceFormComponent,canActivate: [AuthGuard]  },
+  { path: 'billing/:id/payment', component: PaymentFormComponent,canActivate: [AuthGuard]  },
+  { path: 'billing/detail/:id', component: InvoiceDetailComponent,canActivate: [AuthGuard]  },
 
 
-  // Department routes
-  { path: 'departments', component: DepartmentsComponent },
-  { path: 'departments/new', component: DepartmentFormComponent },
-  { path: 'departments/:id/edit', component: DepartmentFormComponent },
+  // Departments
+  { path: 'departments', component: DepartmentsComponent, canActivate: [AuthGuard] },
+  { path: 'departments/new', component: DepartmentFormComponent, canActivate: [AuthGuard] },
+  { path: 'departments/:id/edit', component: DepartmentFormComponent, canActivate: [AuthGuard] },
 
-  // Doctor routes
-  { path: 'doctors', component: DoctorsComponent },
-  { path: 'doctors/new', component: DoctorFormComponent },
-  { path: 'doctors/:id/edit', component: DoctorFormComponent },
+  // Doctors
+  { path: 'doctors', component: DoctorsComponent, canActivate: [AuthGuard] },
+  { path: 'doctors/new', component: DoctorFormComponent, canActivate: [AuthGuard] },
+  { path: 'doctors/:id/edit', component: DoctorFormComponent, canActivate: [AuthGuard] },
 
-  // Medicine routes
-  { path: 'medicines', component: MedicinesComponent },
-  { path: 'medicines/new', component: MedicineFormComponent },
-  { path: 'medicines/:id/edit', component: MedicineFormComponent },
-
+  
   // Medicine Category routes
-  { path: 'medicine-category', component: MedicineCategoryComponent },
-  { path: 'medicine-category/new', component: MedicineCategoryFormComponent },
-  { path: 'medicine-category/:id/edit', component: MedicineCategoryFormComponent },
+  { path: 'medicine-category', component: MedicineCategoryComponent, canActivate: [AuthGuard] },
+  { path: 'medicine-category/new', component: MedicineCategoryFormComponent, canActivate: [AuthGuard] },
+  { path: 'medicine-category/:id/edit', component: MedicineCategoryFormComponent, canActivate: [AuthGuard] },
 
+  // Medicines
+  { path: 'medicines', component: MedicinesComponent, canActivate: [AuthGuard] },
+  { path: 'medicines/new', component: MedicineFormComponent, canActivate: [AuthGuard] },
+  { path: 'medicines/:id/edit', component: MedicineFormComponent, canActivate: [AuthGuard] },
 
-  // Procedure routes
-  { path: 'procedures', component: ProceduresComponent },
-  { path: 'procedures/new', component: ProcedureFormComponent },
-  { path: 'procedures/:id/edit', component: ProcedureFormComponent },
+  // Procedures
+  { path: 'procedures', component: ProceduresComponent, canActivate: [AuthGuard] },
+  { path: 'procedures/new', component: ProcedureFormComponent, canActivate: [AuthGuard] },
+  { path: 'procedures/:id/edit', component: ProcedureFormComponent, canActivate: [AuthGuard] },
 
+  // My profile
+  { path: 'my-profile', component: MyProfileComponent, canActivate: [AuthGuard] },
 
+  // User management & settings
+  { path: 'user-management', component: UserManagementComponent, canActivate: [AuthGuard] },
+  { path: 'settings', component: SystemSettingsComponent, canActivate: [AuthGuard] },
 
-
-  { path: 'my-profile', component: MyProfileComponent },
-  { path: 'user-management', component: UserManagementComponent },
-  { path: 'settings', component: SystemSettingsComponent },
-
-  //  {
-  //       path: '',
-  //       redirectTo: '/authentication/login',
-  //       pathMatch: 'full',
-  //     },
-
-  //  { path: '**', redirectTo: '/dashboard' } // fallback
+  // Fallback
+  { path: '**', redirectTo: '/authentication/login' }
 ];
