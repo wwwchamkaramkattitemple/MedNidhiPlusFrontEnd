@@ -22,6 +22,7 @@ export class AppComponent {
   userData: any = null;
   username!: string | null;
   readonly dialog = inject(MatDialog);
+  reportsOpen = false;
 
   constructor(public router: Router, private authService: AuthenticationService, private location: Location, private snackbar: MatSnackBar) {
   }
@@ -51,6 +52,10 @@ export class AppComponent {
       this.openSnackBar("Logout failed", "Retry");
     }
   }
+
+  toggleReports() {
+  this.reportsOpen = !this.reportsOpen;
+}
 
   openChangePassword(event: Event) {
     event.preventDefault();

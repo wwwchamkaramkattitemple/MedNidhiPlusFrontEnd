@@ -43,10 +43,10 @@
 
   <span>{{ invoice.status }}</span>
 
-  <!-- 🔒 Lock indicator -->
+  
   <mat-icon *ngIf="invoice.isLocked" class="ml-10">lock</mat-icon>
 
-  <!-- 💰 Record Payment -->
+ 
   <button
     *ngIf="!invoice.isLocked"
     mat-raised-button

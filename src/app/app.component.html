@@ -62,49 +62,49 @@
       <span class="toolbar-spacer"></span>
       <span class="m-r-8 ">Hi, {{ username }}</span>
 
-      <button mat-icon-button [matMenuTriggerFor]="mastermenu" >
+      <button mat-icon-button [matMenuTriggerFor]="mastermenu">
         <!-- <mat-icon>control_point</mat-icon> -->
-         <mat-icon>settings</mat-icon>
+        <mat-icon>settings</mat-icon>
       </button>
       <!-- Master Menu -->
-<mat-menu #mastermenu="matMenu" class="cardWithShadow">
+      <mat-menu #mastermenu="matMenu" class="cardWithShadow">
 
-  <button mat-menu-item [routerLink]="['/doctors']">
-    <mat-icon style="color: grey;" class="d-flex align-items-center">
-     person_add
-    </mat-icon>
-    <span>Doctors</span>
-  </button>
+        <button mat-menu-item [routerLink]="['/doctors']">
+          <mat-icon style="color: grey;" class="d-flex align-items-center">
+            person_add
+          </mat-icon>
+          <span>Doctors</span>
+        </button>
 
-    <button mat-menu-item [routerLink]="['/departments']">
-    <mat-icon style="color: grey;" class="d-flex align-items-center">
-   business
-    </mat-icon>
-    <span>Departments</span>
-  </button>
+        <button mat-menu-item [routerLink]="['/departments']">
+          <mat-icon style="color: grey;" class="d-flex align-items-center">
+            business
+          </mat-icon>
+          <span>Departments</span>
+        </button>
 
-  <button mat-menu-item [routerLink]="['/procedures']">
-    <mat-icon style="color: grey;" class="d-flex align-items-center">
-    science
-    </mat-icon>
-    <span>Procedures</span>
-  </button>
+        <button mat-menu-item [routerLink]="['/procedures']">
+          <mat-icon style="color: grey;" class="d-flex align-items-center">
+            science
+          </mat-icon>
+          <span>Procedures</span>
+        </button>
 
-  <button mat-menu-item [routerLink]="['/medicines']">
-    <mat-icon style="color: grey;" class="d-flex align-items-center">
-     local_pharmacy
-    </mat-icon>
-    <span>Medicines</span>
-  </button>
+        <button mat-menu-item [routerLink]="['/medicines']">
+          <mat-icon style="color: grey;" class="d-flex align-items-center">
+            local_pharmacy
+          </mat-icon>
+          <span>Medicines</span>
+        </button>
 
-   <button mat-menu-item [routerLink]="['/medicine-category']">
-    <mat-icon style="color: grey;" class="d-flex align-items-center">
-     category
-    </mat-icon>
-    <span>Medicine Category</span>
-  </button>
+        <button mat-menu-item [routerLink]="['/medicine-category']">
+          <mat-icon style="color: grey;" class="d-flex align-items-center">
+            category
+          </mat-icon>
+          <span>Medicine Category</span>
+        </button>
 
-</mat-menu>
+      </mat-menu>
 
 
       <button mat-icon-button [matMenuTriggerFor]="profilemenu">
@@ -123,7 +123,7 @@
           <span>Change Password</span>
         </button>
 
-          <button mat-menu-item (click)="openUserManagement($event)">
+        <button mat-menu-item (click)="openUserManagement($event)">
           <mat-icon style="color: grey;">manage_accounts</mat-icon>
           <span>User Management</span>
         </button>
@@ -139,7 +139,7 @@
     <!-- Sidenav -->
     <mat-sidenav-container class="app-sidenav-container">
       <mat-sidenav #sidenav mode="side" opened class="app-sidenav">
-        <mat-nav-list>
+        <!-- <mat-nav-list>
           <a mat-list-item routerLink="/dashboard">
             <mat-icon matListItemIcon>dashboard</mat-icon>
             <span matListItemTitle>Dashboard</span>
@@ -156,15 +156,89 @@
             <mat-icon matListItemIcon>receipt</mat-icon>
             <span matListItemTitle>Billing</span>
           </a>
+           <a mat-list-item routerLink="/settings">
+            <mat-icon matListItemIcon>tune</mat-icon>
+            <span matListItemTitle>Settings</span>
+          </a>
           <a mat-list-item routerLink="/reports">
             <mat-icon matListItemIcon>bar_chart</mat-icon>
             <span matListItemTitle>Reports</span>
           </a>
-          <a mat-list-item routerLink="/settings">
+
+        
+
+         
+        </mat-nav-list> -->
+
+        <mat-nav-list>
+
+          <a mat-list-item routerLink="/dashboard">
+            <mat-icon matListItemIcon>dashboard</mat-icon>
+            <span matListItemTitle>Dashboard</span>
+          </a>
+
+          <a mat-list-item routerLink="/patients">
+            <mat-icon matListItemIcon>people</mat-icon>
+            <span matListItemTitle>Patients</span>
+          </a>
+
+          <a mat-list-item routerLink="/appointments">
+            <mat-icon matListItemIcon>event</mat-icon>
+            <span matListItemTitle>Appointments</span>
+          </a>
+
+          <a mat-list-item routerLink="/billing">
+            <mat-icon matListItemIcon>receipt</mat-icon>
+            <span matListItemTitle>Billing</span>
+          </a>
+
+          <a mat-list-item (click)="toggleReports()">
+            <mat-icon matListItemIcon>bar_chart</mat-icon>
+
+            <span matListItemTitle class="reports-title">
+              Reports
+              <mat-icon class="chevron-inline">
+                {{ reportsOpen ? 'expand_less' : 'expand_more' }}
+              </mat-icon>
+            </span>
+          </a>
+
+          <!-- REPORTS CHILD ITEMS -->
+          <div *ngIf="reportsOpen">
+            <a mat-list-item class="child-item" routerLink="/daily-collection-report">
+              <mat-icon   matListItemIcon>today</mat-icon>
+              <span matListItemTitle>Daily Collection</span>
+            </a>
+
+            <a mat-list-item class="child-item" routerLink="/doctor-revenue-report">
+              <mat-icon matListItemIcon>person</mat-icon>
+              <span matListItemTitle>Doctor Revenue</span>
+            </a>
+
+            <a mat-list-item class="child-item" routerLink="/reports/monthly">
+              <mat-icon matListItemIcon>healing</mat-icon>
+              <span matListItemTitle>Department Revenue</span>
+            </a>
+
+            <a mat-list-item class="child-item" routerLink="/reports/patient">
+              <mat-icon matListItemIcon>vaccines</mat-icon>
+              <span matListItemTitle>Medicine Stock</span>
+            </a>
+
+            <a mat-list-item class="child-item" routerLink="/reports/finance">
+              <mat-icon matListItemIcon>account_balance</mat-icon>
+              <span matListItemTitle>Payment History</span>
+            </a>
+          </div>
+
+           <a mat-list-item routerLink="/settings">
             <mat-icon matListItemIcon>tune</mat-icon>
             <span matListItemTitle>Settings</span>
           </a>
+
         </mat-nav-list>
+
+
       </mat-sidenav>
 
       <mat-sidenav-content class="app-sidenav-content">

@@ -1,0 +1,138 @@
+.report-container {
+  padding: 16px;
+}
+
+.filter-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.bold {
+  font-weight: 600;
+}
+
+.align-right {
+  text-align: right;
+}
+
+.footer-row td {
+  border-top: 2px solid #ccc;
+}
+
+
+.reports-container {
+  padding: 20px;
+}
+
+.reports-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  h1 {
+    margin: 0;
+  }
+}
+
+
+
+.search-field {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+}
+
+.mat-column-actions {
+  width: 120px;
+  text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .reports-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .mat-column-email,
+  .mat-column-dateOfBirth {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .mat-column-phoneNumber {
+    display: none;
+  }
+}
+
+
+
+  .filter-card {
+    margin-bottom: 20px;
+  }
+
+  .filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+
+    mat-form-field {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: stretch;
+
+      mat-form-field {
+        width: 100%;
+      }
+
+      button {
+        align-self: flex-start;
+      }
+    }
+  }
+
+
+  
+  .reports-table-container {
+    position: relative;
+    min-height: 400px;
+    overflow: auto;
+  }
+
+  .reports-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.report-actions {
+  display: flex;
+  gap: 8px; // 👈 controls spacing
+}
+
+.report-actions button {
+  min-width: 90px;
+}

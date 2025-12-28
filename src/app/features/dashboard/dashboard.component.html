@@ -6,48 +6,57 @@
   <div *ngIf="!isLoading" class="dashboard-content">
     <h1 class="mat-headline-4">Dashboard</h1>
 
+   
+
     <!-- Stats Cards -->
-    <div class="stats-cards">
-      <mat-card class="stat-card">
-        <mat-card-content>
-          <div class="stat-value">{{ stats.totalPatients }}</div>
-          <div class="stat-label">Total Patients</div>
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-button color="primary" routerLink="/patients">View All</button>
-        </mat-card-actions>
-      </mat-card>
+<div class="stats-cards">
+  <mat-card class="stat-card bg-light-primary">
+    <mat-card-content class="stat-content">
+      <mat-icon class="stat-icon text-primary">people</mat-icon>
+      <div class="stat-label text-primary">Total Patients</div>
+      <div class="stat-value text-primary">{{ stats.totalPatients }}</div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button color="primary" routerLink="/patients">View All</button>
+    </mat-card-actions>
+  </mat-card>
 
-      <mat-card class="stat-card">
-        <mat-card-content>
-          <div class="stat-value">{{ stats.appointmentsToday }}</div>
-          <div class="stat-label">Today's Appointments</div>
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-button color="primary" routerLink="/appointments">View All</button>
-        </mat-card-actions>
-      </mat-card>
+  <mat-card class="stat-card bg-light-warning">
+    <mat-card-content class="stat-content">
+      <mat-icon class="stat-icon text-warning">event</mat-icon>
+      <div class="stat-label text-warning">Today's Appointments</div>
+      <div class="stat-value text-warning">{{ stats.appointmentsToday }}</div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button color="primary" routerLink="/appointments">View All</button>
+    </mat-card-actions>
+  </mat-card>
 
-      <mat-card class="stat-card">
-        <mat-card-content>
-          <div class="stat-value">{{ stats.pendingInvoices }}</div>
-          <div class="stat-label">Pending Invoices</div>
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-button color="primary" routerLink="/billing">View All</button>
-        </mat-card-actions>
-      </mat-card>
+  <mat-card class="stat-card bg-light-danger">
+    <mat-card-content class="stat-content">
+      <mat-icon class="stat-icon text-danger">receipt_long</mat-icon>
+      <div class="stat-label text-danger">Pending Invoices</div>
+      <div class="stat-value text-danger">{{ stats.pendingInvoices }}</div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button color="primary" routerLink="/billing">View All</button>
+    </mat-card-actions>
+  </mat-card>
 
-      <mat-card class="stat-card">
-        <mat-card-content>
-          <div class="stat-value">&#8377; {{ stats.revenueThisMonth }}</div>
-          <div class="stat-label">Revenue This Month</div>
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-button color="primary" routerLink="/reports">View Reports</button>
-        </mat-card-actions>
-      </mat-card>
-    </div>
+  <mat-card class="stat-card bg-light-success">
+    <mat-card-content class="stat-content">
+      <mat-icon class="stat-icon text-success">currency_rupee</mat-icon>
+      <div class="stat-label text-success">Revenue This Month</div>
+      <div class="stat-value text-success">
+        ₹ {{ stats.revenueThisMonth }}
+      </div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button color="primary" routerLink="/reports">View Reports</button>
+    </mat-card-actions>
+  </mat-card>
+</div>
+
 
     <!-- Recent Activity -->
     <div class="recent-activity">

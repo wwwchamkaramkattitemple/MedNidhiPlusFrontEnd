@@ -47,3 +47,58 @@
   margin-right: 20px;
 }
 
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.chevron-inline {
+  font-size: 18px;
+  opacity: 0.6;
+
+  /* MICRO ADJUSTMENT */
+  position: relative;
+  left: 10px;   /* move right */
+  top: 2px;    /* move down */
+}
+
+
+.chevron {
+  transition: transform 0.2s ease;
+}
+
+.reports-open .chevron {
+  transform: rotate(180deg);
+}
+
+.reports-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px; /* spacing between text and chevron */
+}
+
+.chevron-inline {
+  font-size: 18px;
+  opacity: 0.6;
+  line-height: 1;
+}
+
+/* Child indentation exactly like Material docs */
+.child-item {
+  padding-left: 56px !important;
+}
+
+/* Keep same height */
+a.mat-list-item {
+  height: 48px;
+}
+
+
+.child-item {
+  padding-left: 16px !important;   /* keep normal */
+}
+
+.child-item mat-icon {
+  margin-left: 24px;   /* indent icon only */
+  margin-right: 16px;
+}

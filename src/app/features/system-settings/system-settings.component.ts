@@ -31,14 +31,6 @@ export class SystemSettingsComponent implements OnInit {
     this.loadSettingsData();
   }
 
-  // initForm(): void {
-  //   this.settingsForm = this.fb.group({
-  //     clinicName: ['', [Validators.required, Validators.maxLength(100)]],
-  //     feePriority: ['Default', Validators.required],
-  //     defaultRevisitDays: [15, [Validators.required, Validators.min(1)]],
-  //     defaultFee: [200, [Validators.required, Validators.min(2)]]
-  //   });
-  // }
 
   initForm(): void {
     this.settingsForm = this.fb.group({
@@ -48,6 +40,7 @@ export class SystemSettingsComponent implements OnInit {
       clinicPhone: [''],
       clinicEmail: ['', Validators.email],
       clinicGstNumber: [''],
+      specialityName: [''],
 
       // Billing
       feePriority: ['Default', Validators.required],
@@ -57,6 +50,7 @@ export class SystemSettingsComponent implements OnInit {
       // Invoice Print
       defaultInvoicePrintMode: ['Normal', Validators.required],
       defaultInvoiceDesign: ['Classic', Validators.required],
+      defaultReportDesign: ['Classic', Validators.required],
 
       // PDF Messages
       pdfHeaderMessage: [''],
@@ -101,6 +95,7 @@ export class SystemSettingsComponent implements OnInit {
     this.isLoading = true;
 
     const settingsData = this.settingsForm.value;
+    console.log(settingsData);
 
     this.settingsService.saveSettings(settingsData).subscribe({
       next: () => {

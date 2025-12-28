@@ -27,6 +27,8 @@ import { MedicineCategoryComponent } from './features/medicine-category/medicine
 import { MedicineCategoryFormComponent } from './features/medicine-category/medicine-category-form/medicine-category-form.component';
 import { PaymentFormComponent } from './features/billing/payment-form/payment-form.component';
 import { AuthGuard } from './features/authentication/auth.guard';
+import { DailyCollectionReportComponent } from './features/reports/daily-collection-report/daily-collection-report.component';
+import { DoctorRevenueReportComponent } from './features/reports/doctor-revenue-report/doctor-revenue-report.component';
 
 export const appRoutes: Routes = [
 
@@ -98,6 +100,12 @@ export const appRoutes: Routes = [
   { path: 'procedures', component: ProceduresComponent, canActivate: [AuthGuard] },
   { path: 'procedures/new', component: ProcedureFormComponent, canActivate: [AuthGuard] },
   { path: 'procedures/:id/edit', component: ProcedureFormComponent, canActivate: [AuthGuard] },
+
+   // Reports
+  { path: 'daily-collection-report', component: DailyCollectionReportComponent, canActivate: [AuthGuard] },
+  { path: 'doctor-revenue-report', component: DoctorRevenueReportComponent, canActivate: [AuthGuard] },
+  { path: 'medicines/:id/edit', component: MedicineFormComponent, canActivate: [AuthGuard] },
+
 
   // My profile
   { path: 'my-profile', component: MyProfileComponent, canActivate: [AuthGuard] },
