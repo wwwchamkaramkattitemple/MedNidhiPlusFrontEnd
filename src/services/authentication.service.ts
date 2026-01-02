@@ -15,21 +15,16 @@ export interface RegisterRequest {
   username: string;
   password: string;
   email: string;
-  firstName?: string;  
-  lastName?: string;  
+  firstName?: string;
+  lastName?: string;
 }
 
-interface DecodedToken {
-  sub?: string;
-  username?: string;
-  exp?: number;
-  iat?: number;
-  [key: string]: any;
-}
+
 
 export interface UserData {
   AuthToken: string;
   UserName: string;
+  roles: string[];
 }
 
 @Injectable({
@@ -38,11 +33,13 @@ export interface UserData {
 
 export class AuthenticationService {
   private apiUrl = `${environment.apiUrl}`;
+  private userDataSubject = new BehaviorSubject<UserData | null>(this.getUserData());
+  userData$ = this.userDataSubject.asObservable();
+          
 
   constructor(private http: HttpClient, private router: Router, private location: Location) { }
 
-  private usernameSubject = new BehaviorSubject<string | null>(null);
-  username$ = this.usernameSubject.asObservable();
+
 
   login(authenticationRequest: AuthenticationRequest): Observable<any> {
     return this.http.post(this.apiUrl + "/auth/Login", authenticationRequest);
@@ -52,35 +49,55 @@ export class AuthenticationService {
     return this.http.post(this.apiUrl + "/auth/Register", registerRequest);
   }
 
-  storeUserData(user: UserData) {
-    localStorage.setItem('userData', JSON.stringify(user));
-    this.usernameSubject.next(user.UserName);
-  }
-
+ 
   clearUserData() {
     localStorage.removeItem('userData');
-    this.usernameSubject.next(null);
+    this.userDataSubject.next(null);
   }
 
-  getUserData() {
-    const savedUser = localStorage.getItem('userData');
-    return savedUser ? JSON.parse(savedUser) : null;
+
+ storeUserData(user: UserData): void {
+    localStorage.setItem('userData', JSON.stringify(user));
+    this.userDataSubject.next(user); 
   }
 
-  getUsernameFromToken(token: string): string | null {
+  getUserData(): UserData | null {
+    const data = localStorage.getItem('userData');
+    return data ? JSON.parse(data) : null;
+  }
+
+
+ getUsernameFromToken(token: string): string | null {
     try {
-      const decoded = jwtDecode<DecodedToken>(token);
-      return decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"] || null;
-    } catch (err) {
-      console.error('Invalid token', err);
+      const decoded: any = jwtDecode(token);
+      return decoded[
+        'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'
+      ] ?? null;
+    } catch {
       return null;
     }
   }
 
+  getRolesFromToken(token: string): string[] {
+    try {
+      const decoded: any = jwtDecode(token);
+
+      const roles =
+        decoded['role'] ||
+        decoded['roles'] ||
+        decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+
+      if (!roles) return [];
+      return Array.isArray(roles) ? roles : [roles];
+    } catch {
+      return [];
+    }
+  }
+
   getAuthHeaders(): HttpHeaders {
-  const token = localStorage.getItem('token');
-  return new HttpHeaders({ 'Authorization': `Bearer ${token}` });
-}
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+  }
 
   onLogOut() {
     this.clearUserData();
@@ -97,5 +114,8 @@ export class AuthenticationService {
       return true;
     }
   }
-  
+
+ 
+
+
 }

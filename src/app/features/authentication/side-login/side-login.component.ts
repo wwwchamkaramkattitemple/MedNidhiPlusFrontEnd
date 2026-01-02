@@ -20,13 +20,15 @@ export class AppSideLoginComponent {
   ) { }
 
   form = new FormGroup({
-    username: new FormControl('', [Validators.required]), 
-    password: new FormControl('',[Validators.required]), 
+    username: new FormControl('', [Validators.required]),
+    password: new FormControl('', [Validators.required]),
   });
 
   get f() {
     return this.form.controls;
   }
+
+ 
 
   submit() {
     if (this.form.invalid) {
@@ -38,22 +40,26 @@ export class AppSideLoginComponent {
       username: this.form.value.username ?? '',
       password: this.form.value.password ?? ''
     };
+
     this.showSpinner = true;
+
     this.authService.login(authRequest).subscribe({
       next: (response) => {
-        if (response.token != null) {
+        if (response.token) {
           const storeUserData: UserData = {
-            AuthToken: response.token ?? '',
-            UserName: this.authService.getUsernameFromToken(response.token) ?? ''
-          }
+            AuthToken: response.token,
+            UserName: this.authService.getUsernameFromToken(response.token) ?? '',
+            roles: this.authService.getRolesFromToken(response.token)
+          };
+
           this.authService.storeUserData(storeUserData);
-        };
+        }
 
         this.openSnackBar('Login Successful', 'Done');
-        this.showSpinner = true;
         this.router.navigate(['/dashboard']);
         this.showSpinner = false;
       },
+
       error: (err) => {
         this.showSpinner = false;
         if (err.status === 401) {
@@ -61,9 +67,10 @@ export class AppSideLoginComponent {
         } else {
           this.openSnackBar('An error occurred, please try again', 'Retry');
         }
-      },
+      }
     });
   }
+
 
   openSnackBar(message: string, action: string) {
     this.snackbar.open(message, action, {
@@ -75,8 +82,8 @@ export class AppSideLoginComponent {
   }
 
   goRegister(event: Event) {
-  event.preventDefault();   // prevent default anchor behavior
-  this.router.navigate(['/authentication/register']); // navigate immediately
-}
+    event.preventDefault();   // prevent default anchor behavior
+    this.router.navigate(['/authentication/register']); // navigate immediately
+  }
 
 }

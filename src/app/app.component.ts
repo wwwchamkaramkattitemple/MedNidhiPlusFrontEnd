@@ -9,13 +9,16 @@ import { ChangePasswordComponent } from './features/user-profile/change-password
 import { MatDialog } from '@angular/material/dialog';
 import { MyProfileComponent } from './features/user-profile/my-profile/my-profile.component';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { NavigationEnd } from '@angular/router';
+import { filter, take } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-root',
   standalone: true,
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  imports: [MaterialModule, RouterModule, CommonModule,MatExpansionModule]
+  imports: [MaterialModule, RouterModule, CommonModule, MatExpansionModule]
 })
 export class AppComponent {
   title = 'Clinic Billing System';
@@ -23,39 +26,59 @@ export class AppComponent {
   username!: string | null;
   readonly dialog = inject(MatDialog);
   reportsOpen = false;
+  currentUser: any = null;
+  isReady = false;
 
   constructor(public router: Router, private authService: AuthenticationService, private location: Location, private snackbar: MatSnackBar) {
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.reportsOpen = event.urlAfterRedirects.includes('report');
+      });
   }
   hiddenRoutes = ['/authentication/login', '/authentication/register'];
 
   isAuthRoute(): boolean {
-    return this.hiddenRoutes.includes(this.router.url);
+    return this.router.url.startsWith('/authentication');
   }
+
+
+
 
   ngOnInit() {
-    this.authService.username$.subscribe(name => {
-      this.username = name ?? '';
-    });
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        take(1)
+      )
+      .subscribe(() => {
+        this.isReady = true;
+      });
 
-    const user = this.authService.getUserData();
-    if (user) {
-      this.authService.storeUserData(user);
-    }
+    this.authService.userData$.subscribe(user => {
+      this.currentUser = user;
+      this.username = user?.UserName ?? '';
+    });
   }
+
+
 
   onLogOut(event: Event) {
     event.preventDefault();
-    if (this.username != null) {
-      this.authService.onLogOut();
-      this.openSnackBar("Logout Successful", "Done");
-    } else {
-      this.openSnackBar("Logout failed", "Retry");
-    }
+    this.authService.onLogOut();
+    this.openSnackBar('Logout successful', 'Done');
+    this.router.navigate(['/authentication/login']);
   }
 
+
+  hasRole(role: string): boolean {
+    return this.currentUser?.roles?.includes(role);
+  }
+
+
   toggleReports() {
-  this.reportsOpen = !this.reportsOpen;
-}
+    this.reportsOpen = !this.reportsOpen;
+  }
 
   openChangePassword(event: Event) {
     event.preventDefault();
@@ -69,7 +92,7 @@ export class AppComponent {
     this.router.navigate(['/my-profile']);
   }
 
-   openUserManagement(event: Event) {
+  openUserManagement(event: Event) {
     event.preventDefault();
     this.router.navigate(['/user-management']);
   }

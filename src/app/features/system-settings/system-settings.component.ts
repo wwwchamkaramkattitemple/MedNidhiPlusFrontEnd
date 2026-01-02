@@ -95,8 +95,6 @@ export class SystemSettingsComponent implements OnInit {
     this.isLoading = true;
 
     const settingsData = this.settingsForm.value;
-    console.log(settingsData);
-
     this.settingsService.saveSettings(settingsData).subscribe({
       next: () => {
         this.isLoading = false;

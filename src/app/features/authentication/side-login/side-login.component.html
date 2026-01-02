@@ -1,6 +1,9 @@
 <div class="login-container">
-  <div class="login-card">
+  <div class="login-card card-wrapper">
 
+     <div class="overlay" *ngIf="showSpinner">
+      <mat-spinner diameter="100"></mat-spinner>
+    </div>
 
 
     <!-- Left Side: Login Form -->
@@ -18,6 +21,9 @@
       </div>
 
     </div>
+
+   
+
 
 
     <!-- Right Side: Illustration -->

@@ -169,3 +169,26 @@
     font-size: 2rem;
   }
 }
+
+
+.card-wrapper {
+  position: relative;
+}
+
+.login-container {
+  position: relative;
+}
+
+.overlay {
+  position: fixed;   /* 🔥 key */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
+  background: rgba(255, 255, 255, 0.75);
+  z-index: 9999;
+
+  display: grid;
+  place-items: center;
+}
